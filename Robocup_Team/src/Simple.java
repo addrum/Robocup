@@ -50,7 +50,7 @@ public class Simple implements ControllerPlayer {
      */
     public Simple() {
         random = new Random(System.currentTimeMillis() + count);
-        count++;
+        count++;        
     }
 
     /** {@inheritDoc} */
@@ -70,7 +70,7 @@ public class Simple implements ControllerPlayer {
     public void preInfo() {
         canSeeOwnGoal = false;
         canSeeBall    = false;
-        canSeeNothing = true;
+        canSeeNothing = true;        
     }
 
     /** {@inheritDoc} */
@@ -161,6 +161,7 @@ public class Simple implements ControllerPlayer {
     public void infoSeeFlagGoalOwn(Flag flag, double distance, double direction, double distChange, double dirChange,
                                    double bodyFacingDirection, double headFacingDirection) {
         canSeeNothing = false;
+        System.out.print("THINGSSSSSS!!!! ->>>>>> " + flag.name() + " - " + distance + " - " + direction + " - " + distChange + " - " + dirChange + " - " + bodyFacingDirection + headFacingDirection);
         if (flag == Flag.CENTER) {
             this.canSeeOwnGoal    = true;
             this.distanceOwnGoal  = distance;
@@ -213,7 +214,7 @@ public class Simple implements ControllerPlayer {
             this.pause(1000);
             switch (this.getPlayer().getNumber()) {
                 case 1 :
-                    this.getPlayer().move(-10, 0);
+                    this.getPlayer().move(-50, 0);
                     break;
                 case 2 :
                     this.getPlayer().move(-10, 10);
