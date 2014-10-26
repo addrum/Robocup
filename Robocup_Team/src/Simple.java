@@ -39,10 +39,18 @@ public class Simple implements ControllerPlayer {
     private boolean       canSeeOwnGoal = false;
     private boolean       canSeeNothing = true;
     private boolean       canSeeBall    = false;
+    private boolean		  goalie = false;
+    private boolean		  goalieCanMove = false;			
     private double        directionBall;
     private double        directionOwnGoal;
+    private double		  directionOtherGoal;
+    private double		  directionOwnPlayer;
     private double        distanceBall;
     private double        distanceOwnGoal;
+    private double		  distanceOtherGoal;
+    private double		  distanceOwnPlayer;
+    private double		  distanceOtherPlayer;
+    private double		  distanceBallOwnPlayer;
     private ActionsPlayer player;
 
     /**
@@ -76,21 +84,32 @@ public class Simple implements ControllerPlayer {
     /** {@inheritDoc} */
     @Override
     public void postInfo() {
-        if (canSeeNothing) {
-            canSeeNothingAction();
-        } else if (canSeeOwnGoal) {
-            if ((distanceOwnGoal < 40) && (distanceOwnGoal > 10)) {
-                canSeeOwnGoalAction();
-            } else if (canSeeBall) {
-                canSeeBallAction();
-            } else {
-                canSeeAnythingAction();
-            }
-        } else if (canSeeBall) {
-            canSeeBallAction();
-        } else {
-            canSeeAnythingAction();
-        }
+    	if (!goalie) {
+	        if (canSeeNothing) {
+	            canSeeNothingAction();
+	        } else if (canSeeOwnGoal) {
+	        	distanceOtherGoal = 108 - distanceOwnGoal;
+	            if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {
+	                canSeeOwnGoalAction();
+	            } else if (canSeeBall) {
+	        		if (distanceOtherPlayer < 10) {
+	        			canSeeBallAction(directionOwnPlayer);
+	        		} else {
+	        			canSeeBallAction(directionOtherGoal);
+	        		}
+	            } else {
+	                canSeeAnythingAction();
+	            }
+	        } else if (canSeeBall) {
+	    		if (distanceOtherPlayer < 10) {
+	    			canSeeBallAction(directionOwnPlayer);
+	    		} else {
+	    			canSeeBallAction(directionOtherGoal);
+	    		}
+	        } else {
+	            canSeeAnythingAction();
+	        }
+    	}
     }
 
     /** {@inheritDoc} */
@@ -173,6 +192,8 @@ public class Simple implements ControllerPlayer {
     public void infoSeeFlagGoalOther(Flag flag, double distance, double direction, double distChange, double dirChange,
                                      double bodyFacingDirection, double headFacingDirection) {
         canSeeNothing = false;
+        this.distanceOtherGoal = distance;
+        this.directionOtherGoal = direction;
     }
 
     /** {@inheritDoc} */
@@ -185,12 +206,18 @@ public class Simple implements ControllerPlayer {
     /** {@inheritDoc} */
     @Override
     public void infoSeePlayerOther(int number, boolean goalie, double distance, double direction, double distChange,
-                                   double dirChange, double bodyFacingDirection, double headFacingDirection) {}
+                                   double dirChange, double bodyFacingDirection, double headFacingDirection) {
+    	this.distanceOtherPlayer = distance;
+    }
 
     /** {@inheritDoc} */
     @Override
     public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange,
-                                 double dirChange, double bodyFacingDirection, double headFacingDirection) {}
+                                 double dirChange, double bodyFacingDirection, double headFacingDirection) {
+    	this.distanceOwnPlayer = distance;
+    	this.directionOwnPlayer = direction;
+    	this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall) + (distanceOwnPlayer * distanceOwnPlayer));
+    }
 
     /** {@inheritDoc} */
     @Override
@@ -213,7 +240,8 @@ public class Simple implements ControllerPlayer {
             this.pause(1000);
             switch (this.getPlayer().getNumber()) {
                 case 1 :
-                    this.getPlayer().move(-10, 0);
+                    this.getPlayer().move(-50, 0);
+                    this.goalie = true;
                     break;
                 case 2 :
                     this.getPlayer().move(-10, 10);
@@ -248,6 +276,12 @@ public class Simple implements ControllerPlayer {
                 default :
                     throw new Error("number must be initialized before move");
             }
+        }
+        if (playMode == PlayMode.GOAL_KICK_OWN) {
+        	goalieCanMove = true;
+        } else if (goalie) {
+        	this.getPlayer().move(-50, 0);
+        	goalieCanMove = false;
         }
     }
 
@@ -318,12 +352,17 @@ public class Simple implements ControllerPlayer {
      * This is the action performed when the player can see the ball.
      * It involves running at it and kicking it...
      */
-    private void canSeeBallAction() {
-        getPlayer().dash(this.randomDashValueFast());
-        turnTowardBall();
-        if (distanceBall < 0.7) {
-            getPlayer().kick(50, randomKickDirectionValue());
-        }
+    private void canSeeBallAction(double direction) {
+    	if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
+    		getPlayer().dash(this.randomDashValueSlow());
+            getPlayer().turn(180);
+    	} else {
+	        getPlayer().dash(this.randomDashValueFast());
+	        turnTowardBall();
+	        if (distanceBall < 0.7) {
+	            getPlayer().kick(50, direction);
+	        }
+    	}
         if (log.isDebugEnabled()) {
             log.debug("b(" + directionBall + "," + distanceBall + ")");
         }
@@ -333,8 +372,13 @@ public class Simple implements ControllerPlayer {
      * If the player can see anything that is not a ball or a goal, it turns.
      */
     private void canSeeAnythingAction() {
-        getPlayer().dash(this.randomDashValueSlow());
-        getPlayer().turn(20);
+    	if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
+    		getPlayer().dash(this.randomDashValueSlow());
+            getPlayer().turn(180);
+    	} else {
+	        getPlayer().dash(this.randomDashValueSlow());
+	        getPlayer().turn(20);
+    	}
         if (log.isDebugEnabled()) {
             log.debug("a");
         }
