@@ -161,7 +161,6 @@ public class Simple implements ControllerPlayer {
     public void infoSeeFlagGoalOwn(Flag flag, double distance, double direction, double distChange, double dirChange,
                                    double bodyFacingDirection, double headFacingDirection) {
         canSeeNothing = false;
-        System.out.print("THINGSSSSSS!!!! ->>>>>> " + flag.name() + " - " + distance + " - " + direction + " - " + distChange + " - " + dirChange + " - " + bodyFacingDirection + headFacingDirection);
         if (flag == Flag.CENTER) {
             this.canSeeOwnGoal    = true;
             this.distanceOwnGoal  = distance;
