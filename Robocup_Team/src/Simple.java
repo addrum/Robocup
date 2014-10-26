@@ -93,18 +93,18 @@ public class Simple implements ControllerPlayer {
 	                canSeeOwnGoalAction();
 	            } else if (canSeeBall) {
 	        		if (distanceOtherPlayer < 10) {
-	        			canSeeBallAction(directionOwnPlayer);
+	        			canSeeBallAction(directionOwnPlayer, false);
 	        		} else {
-	        			canSeeBallAction(directionOtherGoal);
+	        			canSeeBallAction(directionOtherGoal, true);
 	        		}
 	            } else {
 	                canSeeAnythingAction();
 	            }
 	        } else if (canSeeBall) {
 	    		if (distanceOtherPlayer < 10) {
-	    			canSeeBallAction(directionOwnPlayer);
+	    			canSeeBallAction(directionOwnPlayer, false);
 	    		} else {
-	    			canSeeBallAction(directionOtherGoal);
+	    			canSeeBallAction(directionOtherGoal, true);
 	    		}
 	        } else {
 	            canSeeAnythingAction();
@@ -276,6 +276,7 @@ public class Simple implements ControllerPlayer {
                 default :
                     throw new Error("number must be initialized before move");
             }
+            this.getPlayer().turn(directionOtherGoal);
         }
         if (playMode == PlayMode.GOAL_KICK_OWN) {
         	goalieCanMove = true;
@@ -352,7 +353,7 @@ public class Simple implements ControllerPlayer {
      * This is the action performed when the player can see the ball.
      * It involves running at it and kicking it...
      */
-    private void canSeeBallAction(double direction) {
+    private void canSeeBallAction(double direction, boolean dribble) {
     	if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
     		getPlayer().dash(this.randomDashValueSlow());
             getPlayer().turn(180);
@@ -360,7 +361,13 @@ public class Simple implements ControllerPlayer {
 	        getPlayer().dash(this.randomDashValueFast());
 	        turnTowardBall();
 	        if (distanceBall < 0.7) {
-	            getPlayer().kick(50, direction);
+	        	getPlayer().turn(directionOtherGoal);
+	        	if (dribble) {
+	        		getPlayer().kick(20, direction);
+	        	} else {
+	        		getPlayer().kick(50, direction);
+	        	}
+	        	getPlayer().turn(directionBall);
 	        }
     	}
         if (log.isDebugEnabled()) {
@@ -374,7 +381,7 @@ public class Simple implements ControllerPlayer {
     private void canSeeAnythingAction() {
     	if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
     		getPlayer().dash(this.randomDashValueSlow());
-            getPlayer().turn(180);
+    		getPlayer().turn(180);
     	} else {
 	        getPlayer().dash(this.randomDashValueSlow());
 	        getPlayer().turn(20);
@@ -398,8 +405,9 @@ public class Simple implements ControllerPlayer {
      * If the player can see its own goal, it goes and stands by it...
      */
     private void canSeeOwnGoalAction() {
+    	turnTowardOwnGoal();
         getPlayer().dash(this.randomDashValueFast());
-        turnTowardOwnGoal();
+        getPlayer().turn(180);
         if (log.isDebugEnabled()) {
             log.debug("g(" + directionOwnGoal + "," + distanceOwnGoal + ")");
         }
