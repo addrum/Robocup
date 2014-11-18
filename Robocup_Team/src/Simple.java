@@ -38,16 +38,15 @@ public class Simple implements ControllerPlayer {
 	private boolean canSeeOwnGoal = false;
 	private boolean canSeeNothing = true;
 	private boolean canSeeBall = false;
-	private boolean goalie = false;
-	private boolean goalieCanMove = false;
+	private boolean dribble = false;
 	private double directionBall;
-	private double directionOwnGoal;
-	private double directionOtherGoal;
+	private double directionOwnGoal = -1.0;
+	private double directionOtherGoal = 0;
 	private double directionOwnPlayer;
 	private double directionToTurn;
 	private double distanceBall;
 	private double distanceOwnGoal;
-	private double distanceOtherGoal;
+	private double distanceOtherGoal = 1000;
 	private double distanceOwnPlayer;
 	private double distanceOtherPlayer;
 	private double distanceBallOwnPlayer;
@@ -84,15 +83,15 @@ public class Simple implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		if (canSeeNothing) {
+		/*if (canSeeNothing) {
 		} else if (canSeeOwnGoal) {
 			if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {
 				canSeeOwnGoalAction();
 			} else if (canSeeBall) {
 				if (distanceOtherPlayer < 10) {
-					canSeeBallAction(directionOwnPlayer, false);
+					canSeeBallAction(directionOwnPlayer);
 				} else {
-					canSeeBallAction(directionOtherGoal, true);
+					canSeeBallAction(directionOtherGoal);
 				}
 			} else {
 				canSeeAnythingAction();
@@ -100,148 +99,118 @@ public class Simple implements ControllerPlayer {
 
 		} else if (canSeeBall) {
 			if (distanceOtherPlayer < 10) {
-				canSeeBallAction(directionOwnPlayer, false);
+				dribble = false;
+				canSeeBallAction(directionOwnPlayer);
 			} else {
-				canSeeBallAction(directionOtherGoal, true);
+				canSeeBallAction(directionOtherGoal);
 			}
 		} else {
 			canSeeAnythingAction();
-		}
+		}*/
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagRight(Flag flag, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagLeft(Flag flag, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagOwn(Flag flag, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeFlagOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagOther(Flag flag, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeFlagOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCenter(Flag flag, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeFlagCenter(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCornerOwn(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagCornerOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCornerOther(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagCornerOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagPenaltyOwn(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagPenaltyOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagPenaltyOther(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagPenaltyOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagGoalOwn(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagGoalOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 		if (flag == Flag.CENTER) {
-			this.canSeeOwnGoal = true;
-			this.distanceOwnGoal = distance;
-			this.directionOwnGoal = direction;
+			canSeeOwnGoal = true;
+			distanceOwnGoal = distance;
+			directionOwnGoal = direction;
 		}
-		this.distanceOtherGoal = 104 - distanceOwnGoal;
+		distanceOtherGoal = 104 - distanceOwnGoal;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagGoalOther(Flag flag, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagGoalOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
-		this.distanceOtherGoal = distance;
-		this.directionOtherGoal = direction;
+		distanceOtherGoal = distance;
+		directionOtherGoal = direction;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeLine(Line line, double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeLine(Line line, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeePlayerOther(int number, boolean goalie, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeePlayerOther(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		this.distanceOtherPlayer = distance;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeePlayerOwn(int number, boolean goalie, double distance,
-			double direction, double distChange, double dirChange,
-			double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		this.distanceOwnPlayer = distance;
 		this.directionOwnPlayer = direction;
 		this.directionToTurn = 180;
-		this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall)
-				+ (distanceOwnPlayer * distanceOwnPlayer));
+		this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall) + (distanceOwnPlayer * distanceOwnPlayer));
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeBall(double distance, double direction,
-			double distChange, double dirChange, double bodyFacingDirection,
-			double headFacingDirection) {
+	public void infoSeeBall(double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
-		this.canSeeBall = true;
-		this.distanceBall = distance;
-		this.directionBall = direction;
+		canSeeBall = true;
+		distanceBall = distance;
+		directionBall = direction;
 	}
 
 	/** {@inheritDoc} */
@@ -254,10 +223,9 @@ public class Simple implements ControllerPlayer {
 	public void infoHearPlayMode(PlayMode playMode) {
 		if (playMode == PlayMode.BEFORE_KICK_OFF) {
 			this.pause(1000);
-			switch (this.getPlayer().getNumber()) {
+			/*switch (this.getPlayer().getNumber()) {
 			case 1:
 				this.getPlayer().move(-50, 0);
-				this.goalie = true;
 				break;
 			case 2:
 				this.getPlayer().move(-10, 10);
@@ -291,14 +259,8 @@ public class Simple implements ControllerPlayer {
 				break;
 			default:
 				throw new Error("number must be initialized before move");
-			}
+			}*/
 			this.getPlayer().turn(directionOtherGoal);
-		}
-		if (playMode == PlayMode.GOAL_KICK_OWN || playMode == PlayMode.PLAY_ON) {
-			goalieCanMove = true;
-		} else if (goalie) {
-			this.getPlayer().move(-50, 0);
-			goalieCanMove = false;
 		}
 	}
 
@@ -309,11 +271,8 @@ public class Simple implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSenseBody(ViewQuality viewQuality, ViewAngle viewAngle,
-			double stamina, double unknown, double effort, double speedAmount,
-			double speedDirection, double headAngle, int kickCount,
-			int dashCount, int turnCount, int sayCount, int turnNeckCount,
-			int catchCount, int moveCount, int changeViewCount) {
+	public void infoSenseBody(ViewQuality viewQuality, ViewAngle viewAngle, double stamina, double unknown, double effort, double speedAmount, double speedDirection, double headAngle, int kickCount,
+			int dashCount, int turnCount, int sayCount, int turnNeckCount, int catchCount, int moveCount, int changeViewCount) {
 	}
 
 	/** {@inheritDoc} */
@@ -344,25 +303,16 @@ public class Simple implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoPlayerParam(double allowMultDefaultType,
-			double dashPowerRateDeltaMax, double dashPowerRateDeltaMin,
-			double effortMaxDeltaFactor, double effortMinDeltaFactor,
-			double extraStaminaDeltaMax, double extraStaminaDeltaMin,
-			double inertiaMomentDeltaFactor, double kickRandDeltaFactor,
-			double kickableMarginDeltaMax, double kickableMarginDeltaMin,
-			double newDashPowerRateDeltaMax, double newDashPowerRateDeltaMin,
-			double newStaminaIncMaxDeltaFactor, double playerDecayDeltaMax,
-			double playerDecayDeltaMin, double playerTypes, double ptMax,
-			double randomSeed, double staminaIncMaxDeltaFactor, double subsMax) {
+	public void infoPlayerParam(double allowMultDefaultType, double dashPowerRateDeltaMax, double dashPowerRateDeltaMin, double effortMaxDeltaFactor, double effortMinDeltaFactor,
+			double extraStaminaDeltaMax, double extraStaminaDeltaMin, double inertiaMomentDeltaFactor, double kickRandDeltaFactor, double kickableMarginDeltaMax, double kickableMarginDeltaMin,
+			double newDashPowerRateDeltaMax, double newDashPowerRateDeltaMin, double newStaminaIncMaxDeltaFactor, double playerDecayDeltaMax, double playerDecayDeltaMin, double playerTypes,
+			double ptMax, double randomSeed, double staminaIncMaxDeltaFactor, double subsMax) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoPlayerType(int id, double playerSpeedMax,
-			double staminaIncMax, double playerDecay, double inertiaMoment,
-			double dashPowerRate, double playerSize, double kickableMargin,
-			double kickRand, double extraStamina, double effortMax,
-			double effortMin) {
+	public void infoPlayerType(int id, double playerSpeedMax, double staminaIncMax, double playerDecay, double inertiaMoment, double dashPowerRate, double playerSize, double kickableMargin,
+			double kickRand, double extraStamina, double effortMax, double effortMin) {
 	}
 
 	/** {@inheritDoc} */
@@ -384,20 +334,27 @@ public class Simple implements ControllerPlayer {
 	 * This is the action performed when the player can see the ball. It
 	 * involves running at it and kicking it...
 	 */
-	private void canSeeBallAction(double direction, boolean dribble) {
-		if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
-			getPlayer().dash(this.randomDashValueSlow());
+	private void canSeeBallAction(double direction) {
+		if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer < distanceBall)) {
+			dribble = false;
 			getPlayer().turn(directionToTurn);
-		} else {
+			getPlayer().dash(this.randomDashValueSlow());
+		} else if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer > distanceBall)) {
+			getPlayer().turn(directionBall);
 			getPlayer().dash(this.randomDashValueFast());
-			turnTowardBall();
-			if (distanceBall < 0.7) {
-				getPlayer().turn(directionBall);
-				while (dribble) {
-					getPlayer().kick(20, direction);
+			if (distanceBall < 10) {
+				if (distanceBall < 0.7) {
+					getPlayer().turn(directionBall);
+					getPlayer().dash(randomDashValueVeryFast());
+					while (dribble) {
+						getPlayer().kick(20, directionOtherGoal);
+					}
+					getPlayer().kick(50, directionOtherGoal);
 				}
-				getPlayer().kick(50, direction);
 			}
+		} else {
+			getPlayer().turn(20);
+			getPlayer().dash(this.randomDashValueSlow());
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("b(" + directionBall + "," + distanceBall + ")");
@@ -408,7 +365,7 @@ public class Simple implements ControllerPlayer {
 	 * If the player can see anything that is not a ball or a goal, it turns.
 	 */
 	private void canSeeAnythingAction() {
-		if (distanceOwnPlayer < 5 && (distanceBallOwnPlayer > distanceBall)) {
+		if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer > distanceBall)) {
 			getPlayer().dash(this.randomDashValueSlow());
 			getPlayer().turn(directionToTurn);
 		} else {
@@ -449,6 +406,10 @@ public class Simple implements ControllerPlayer {
 	 */
 	private int randomDashValueFast() {
 		return 30 + random.nextInt(100);
+	}
+
+	private int randomDashValueVeryFast() {
+		return 100 + random.nextInt(30);
 	}
 
 	/**

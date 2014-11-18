@@ -33,6 +33,8 @@ public class SimplySillyTeam extends AbstractTeam {
     public ControllerPlayer getNewControllerPlayer(int number) {
         if (number == 0) 
             return new GoalieManager();
+        else if (number == 1)
+        	return new AttackerManager();
         else 
             return new Simple();
     }

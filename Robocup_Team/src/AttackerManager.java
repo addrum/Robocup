@@ -15,7 +15,6 @@ import com.github.robocup_atan.atan.model.enums.Warning;
 
 //~--- JDK imports ------------------------------------------------------------
 
-
 import java.util.HashMap;
 import java.util.Random;
 
@@ -26,25 +25,23 @@ import java.util.Random;
  *
  * @author Atan
  */
-public class GoalieManager implements ControllerPlayer {
+public class AttackerManager implements ControllerPlayer {
 	private double distBall = 1000;
 	private double dirBall = 0;
 	private double dirOwnGoal = 0;
+	private double dirGoalOther = -1.0;
 	private double distGoal = -1.0;
-	private boolean canSeeGoal = false;
-	private boolean canSeeGoalLeft = false;
-	private boolean canSeeGoalRight = false;
-	private boolean canSeeFieldEnd = false;
-	private boolean alreadySeeingGoal = false;
-	private boolean canSeePenalty = false;
+	private double distGoalOther = 1.0;
+	private double sidelineDistance;
+	private boolean canSeeGoal, canSeeGoalOther, canSeeBall, canSeeSideline, dribble, canSeePenalty, alreadySeeingGoal, canSeeFieldEnd, canSeeGoalRight, canSeeGoalRightOther, canSeeGoalLeft,
+			canSeeGoalLeftOther = false;
 	private ActionsPlayer player;
 	private Random random = null;
 	private static int count = 0;
 	private double dirMultiplier = 1.0;
 	private double goalTurn;
-	private boolean needsToRetreat = false;
 
-	public GoalieManager() {
+	public AttackerManager() {
 		random = new Random(System.currentTimeMillis() + count);
 		count++;
 	}
@@ -54,11 +51,18 @@ public class GoalieManager implements ControllerPlayer {
 	public void preInfo() {
 		distBall = 1000;
 		distGoal = 1000;
+		distGoalOther = 1000;
 		canSeeGoal = false;
+		canSeeGoalOther = false;
 		canSeeGoalLeft = false;
+		canSeeGoalLeftOther = false;
 		canSeeGoalRight = false;
+		canSeeGoalRightOther = false;
 		canSeePenalty = false;
 		canSeeFieldEnd = false;
+		canSeeSideline = false;
+		canSeeBall = false;
+		dribble = false;
 		goalTurn = 0.0;
 	}
 
@@ -66,57 +70,65 @@ public class GoalieManager implements ControllerPlayer {
 	@Override
 	public void postInfo() {
 		if (distBall < 15) {
+			canSeeBall = true;
 			if (distBall < 0.7) {
-				if (canSeeGoal || canSeePenalty)
-					this.getPlayer().catchBall(dirBall);
-
+				// set dribble to true if this guy is closest to ball
+				dribble = true;
 				if (canSeeGoal)
 					this.getPlayer().kick(60, 135);
-				else
-					this.getPlayer().kick(60, 0);
+				else if (canSeeGoalOther)
+					if (distGoalOther < 5)
+						this.getPlayer().kick(60, dirGoalOther);
+					else {
+						this.getPlayer().kick(60, dirGoalOther);
+					}
 			} else if (canSeeGoal || canSeePenalty) {
 				if (distBall < 2) {
-					needsToRetreat = true;
-
 					getPlayer().turn(dirBall);
 					getPlayer().dash(randomDashValueFast());
 				} else {
-					needsToRetreat = true;
-
-					getPlayer().turn(dirBall);
+					getPlayer().turn(dirOwnGoal);
 					getPlayer().dash(randomDashValueVeryFast());
+				}
+			} else if (canSeeGoalOther) {
+				if (distBall < 2) {
+					getPlayer().turn(dirBall);
+					getPlayer().dash(randomDashValueFast());
+				} else {
+					getPlayer().turn(90);
+					getPlayer().dash(randomDashValueFast());
+				}
+			} else {
+				if (distBall < 2) {
+					getPlayer().turn(dirBall);
+					getPlayer().dash(randomDashValueFast());
+				} else {
+					getPlayer().turn(90);
+					getPlayer().dash(randomDashValueFast());
 				}
 			}
 		} else {
-			if (!canSeeGoal && !needsToRetreat) {
-				if (!canSeePenalty) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
-				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {
-					getPlayer().turn(-1.0 * goalTurn);
+			if (!canSeeBall) {
+				if (distGoal < 500) {
+					getPlayer().turn(dirGoalOther);
 					getPlayer().dash(randomDashValueSlow());
-				} else
-					getPlayer().turn(25 * dirMultiplier);
-			} else {
-				if (!canSeeGoal) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueSlow());
-				} else if (distGoal > 3.5) {
-					if (!alreadySeeingGoal) {
-						getPlayer().turn(dirOwnGoal);
-						alreadySeeingGoal = true;
-					}
-
-					getPlayer().dash(randomDashValueVeryFast());
 				} else {
-					needsToRetreat = false;
-
-					if (alreadySeeingGoal) {
-						getPlayer().turn(goalTurn);
-						alreadySeeingGoal = false;
-					} else
-						alreadySeeingGoal = true;
+					getPlayer().dash(randomDashValueFast());
 				}
+			} else {
+				if (distBall < 15) {
+					getPlayer().turn(dirBall);
+					getPlayer().dash(randomDashValueFast());
+				} else {
+					getPlayer().turn(dirGoalOther);
+					getPlayer().dash(randomDashValueSlow());
+				}
+			}
+		}
+		if (sidelineDistance < 10) {
+			if (!canSeeBall) {
+				getPlayer().turn(90);
+				getPlayer().dash(randomDashValueSlow());
 			}
 		}
 	}
@@ -136,6 +148,8 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeLine(Line line, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		canSeeSideline = true;
+		sidelineDistance = distance;
 	}
 
 	/** {@inheritDoc} */
@@ -143,6 +157,7 @@ public class GoalieManager implements ControllerPlayer {
 	public void infoSeeBall(double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		distBall = distance;
 		dirBall = direction;
+		canSeeBall = true;
 	}
 
 	/** {@inheritDoc} */
@@ -154,7 +169,7 @@ public class GoalieManager implements ControllerPlayer {
 	@Override
 	public void infoHearPlayMode(PlayMode playMode) {
 		if (playMode == PlayMode.BEFORE_KICK_OFF)
-			getPlayer().move(-50, 0);
+			getPlayer().move(-10, 0);
 	}
 
 	/** {@inheritDoc} */
@@ -171,7 +186,7 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public String getType() {
-		return "Goalie";
+		return "Attacker";
 	}
 
 	/** {@inheritDoc} */
@@ -268,6 +283,25 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagGoalOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		if (!alreadySeeingGoal)
+			dirMultiplier *= -1.0;
+
+		distGoalOther = distance;
+		dirGoalOther = direction;
+
+		if (flag.compareTo(Flag.CENTER) == 0) {
+			canSeeGoalOther = true;
+
+			goalTurn = 180;
+		}
+		if (flag.compareTo(Flag.LEFT) == 0) {
+			canSeeGoalLeftOther = true;
+			goalTurn = 90;
+		}
+		if (flag.compareTo(Flag.RIGHT) == 0) {
+			canSeeGoalRightOther = true;
+			goalTurn = -90;
+		}
 	}
 
 	/** {@inheritDoc} */
