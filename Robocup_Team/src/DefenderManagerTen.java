@@ -26,7 +26,7 @@ import java.util.Random;
  *
  * @author Atan
  */
-public class DefenderManager implements ControllerPlayer {
+public class DefenderManagerTen implements ControllerPlayer {
 	private double distBall = 1000;
 	private double dirBall = 0;
 	private double dirOwnGoal = 0;
@@ -44,7 +44,7 @@ public class DefenderManager implements ControllerPlayer {
 	private double goalTurn;
 	private boolean needsToRetreat = false;
 
-	public DefenderManager() {
+	public DefenderManagerTen() {
 		random = new Random(System.currentTimeMillis() + count);
 		count++;
 	}
