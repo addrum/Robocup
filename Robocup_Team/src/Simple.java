@@ -223,13 +223,13 @@ public class Simple implements ControllerPlayer {
 	public void infoHearPlayMode(PlayMode playMode) {
 		if (playMode == PlayMode.BEFORE_KICK_OFF) {
 			this.pause(1000);
-			switch (this.getPlayer().getNumber()) {
+			/*switch (this.getPlayer().getNumber()) {
 			case 1:
 				this.getPlayer().move(-50, 0);
 				break;
-			/*case 2:
+			case 2:
 				this.getPlayer().move(-10, 10);
-				break;*/
+				break;
 			case 3:
 				this.getPlayer().move(-10, -10);
 				break;
@@ -259,7 +259,7 @@ public class Simple implements ControllerPlayer {
 				break;
 			default:
 				throw new Error("number must be initialized before move");
-			}
+			}*/
 			//this.getPlayer().turn(directionOtherGoal);
 		}
 	}

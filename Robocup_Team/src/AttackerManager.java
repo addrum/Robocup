@@ -15,7 +15,6 @@ import com.github.robocup_atan.atan.model.enums.Warning;
 
 //~--- JDK imports ------------------------------------------------------------
 
-
 import java.util.HashMap;
 import java.util.Random;
 
@@ -82,7 +81,7 @@ public class AttackerManager implements ControllerPlayer {
 			if (canSeeBall) {
 				getPlayer().turn(dirBall);
 				getPlayer().turnNeck(dirGoalOther);
-				getPlayer().dash(randomDashValueFast());
+				getPlayer().dash(randomDashValueVeryFast());
 				goingForBall = true;
 			}
 			if (distBall < 0.7) {
@@ -90,15 +89,14 @@ public class AttackerManager implements ControllerPlayer {
 					if (distGoal < 20) {
 						this.getPlayer().kick(60, 135);
 					} else {
-						this.getPlayer().kick(60, dirGoalOther);
+						this.getPlayer().kick(20, dirGoalOther);
 					}
 					getPlayer().turn(dirBall);
 					getPlayer().turnNeck(dirGoalOther);
 				} else if (canSeeGoalOther) {
-					if (distGoalOther < 20) {
-						this.getPlayer().kick(60, dirGoalOther);
+					if (distGoalOther < 23) {
+						this.getPlayer().kick(100, dirGoalOther);
 					} else {
-						System.out.println(distanceOtherPlayer);
 						if (distanceOtherPlayer < 2) {
 							this.getPlayer().kick(30, directionOwnPlayer);
 						} else {
@@ -136,43 +134,44 @@ public class AttackerManager implements ControllerPlayer {
 				getPlayer().turn(dirBall);
 				getPlayer().turnNeck(dirGoalOther);
 				getPlayer().dash(randomDashValueFast());
-			} else if (!canSeeGoal && !needsToRetreat) {
-				if (!canSeePenalty) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
-				} else if ((canSeeGoalLeft || canSeeGoalRight)
-						&& !canSeeFieldEnd) {
-					getPlayer().turn(-1.0 * goalTurn);
-					getPlayer().dash(randomDashValueSlow());
-				} else
-					getPlayer().turn(25 * dirMultiplier);
-			} else {
-				if (!canSeeGoalOther) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueSlow());
-				} else if (distGoalOther > 50) {
-					if (!alreadySeeingGoal) {
-						getPlayer().turn(dirGoalOther);
-						alreadySeeingGoal = true;
-					}
-
-					getPlayer().dash(randomDashValueVeryFast());
-				} else {
-					needsToRetreat = false;
-
-					if (alreadySeeingGoal) {
-						getPlayer().turn(goalTurn);
-						alreadySeeingGoal = false;
+			} else if (!canSeeBall) {
+				if (!canSeeGoal && !needsToRetreat) {
+					if (!canSeePenalty) {
+						getPlayer().turn(90);
+						getPlayer().dash(randomDashValueFast());
+					} else if ((canSeeGoalLeft || canSeeGoalRight)
+							&& !canSeeFieldEnd) {
+						getPlayer().turn(-1.0 * goalTurn);
+						getPlayer().dash(randomDashValueSlow());
 					} else
-						alreadySeeingGoal = true;
+						getPlayer().turn(25 * dirMultiplier);
+				} else {
+					if (!canSeeGoalOther) {
+						getPlayer().turn(90);
+						getPlayer().dash(randomDashValueSlow());
+					} else if (distGoalOther > 50) {
+						if (!alreadySeeingGoal) {
+							getPlayer().turn(dirGoalOther);
+							alreadySeeingGoal = true;
+						}
+
+						getPlayer().dash(randomDashValueVeryFast());
+					} else {
+						needsToRetreat = false;
+
+						if (alreadySeeingGoal) {
+							getPlayer().turn(goalTurn);
+							alreadySeeingGoal = false;
+						} else
+							alreadySeeingGoal = true;
+					}
 				}
 			}
 		}
-		if (sidelineDistance < 10) {
-			if (!goingForBall)
-				getPlayer().turn(90);
-			getPlayer().dash(randomDashValueSlow());
-		}
+		/*
+		 * if (sidelineDistance < 0.5) { if (!goingForBall)
+		 * getPlayer().turn(90); getPlayer().dash(randomDashValueSlow()); }
+		 */
 	}
 
 	/** {@inheritDoc} */
@@ -390,7 +389,8 @@ public class AttackerManager implements ControllerPlayer {
 			double bodyFacingDirection, double headFacingDirection) {
 		distanceOwnPlayer = distance;
 		directionOwnPlayer = direction;
-		distanceBallOwnPlayer = Math.sqrt((distBall * distBall) + (distanceOwnPlayer * distanceOwnPlayer));
+		distanceBallOwnPlayer = Math.sqrt((distBall * distBall)
+				+ (distanceOwnPlayer * distanceOwnPlayer));
 	}
 
 	/** {@inheritDoc} */
