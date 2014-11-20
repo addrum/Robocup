@@ -15,6 +15,7 @@ import com.github.robocup_atan.atan.model.enums.Warning;
 
 //~--- JDK imports ------------------------------------------------------------
 
+
 import java.util.HashMap;
 import java.util.Random;
 
@@ -29,7 +30,7 @@ public class AttackerManager implements ControllerPlayer {
 	private double distBall = 1000;
 	private double dirBall = 0;
 	private double dirOwnGoal = 0;
-	private double dirGoalOther = 180;
+	private double dirGoalOther = 0;
 	private double distGoal = -1.0;
 	private double distGoalOther = 1.0;
 	private double sidelineDistance;
@@ -42,6 +43,10 @@ public class AttackerManager implements ControllerPlayer {
 	private static int count = 0;
 	private double dirMultiplier = 1.0;
 	private double goalTurn;
+	private double distanceOwnPlayer;
+	private double directionOwnPlayer;
+	private double distanceBallOwnPlayer;
+	private double distanceOtherPlayer;
 
 	public AttackerManager() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -54,6 +59,7 @@ public class AttackerManager implements ControllerPlayer {
 		distBall = 1000;
 		distGoal = 1000;
 		distGoalOther = 1000;
+		dirGoalOther = 90;
 		canSeeGoal = false;
 		canSeeGoalOther = false;
 		canSeeGoalLeft = false;
@@ -75,55 +81,62 @@ public class AttackerManager implements ControllerPlayer {
 		if (distBall < 15) {
 			if (canSeeBall) {
 				getPlayer().turn(dirBall);
+				getPlayer().turnNeck(dirGoalOther);
 				getPlayer().dash(randomDashValueFast());
 				goingForBall = true;
 			}
 			if (distBall < 0.7) {
-				if (canSeeBall) {
+				if (canSeeGoal) {
+					if (distGoal < 20) {
+						this.getPlayer().kick(60, 135);
+					} else {
+						this.getPlayer().kick(60, dirGoalOther);
+					}
 					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-					goingForBall = true;
-				}
-				System.out.println(goingForBall);
-				if (canSeeGoal)
-					this.getPlayer().kick(60, 135);
-				else if (canSeeGoalOther) {
-					this.getPlayer().kick(60, dirGoalOther);
-				} else {
-					this.getPlayer().kick(60, dirGoalOther);
-				}
-			} else if (canSeeGoal || canSeePenalty) {
-				System.out.println("can see goal or penalty");
-				if (distBall < 10) {
+					getPlayer().turnNeck(dirGoalOther);
+				} else if (canSeeGoalOther) {
+					if (distGoalOther < 20) {
+						this.getPlayer().kick(60, dirGoalOther);
+					} else {
+						System.out.println(distanceOtherPlayer);
+						if (distanceOtherPlayer < 2) {
+							this.getPlayer().kick(30, directionOwnPlayer);
+						} else {
+							this.getPlayer().kick(20, dirGoalOther);
+						}
+					}
 					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
+					getPlayer().turnNeck(dirGoalOther);
 				} else {
-					getPlayer().turn(dirGoalOther);
-					getPlayer().dash(randomDashValueVeryFast());
-				}
-			} else if (canSeeGoalOther) {
-				System.out.println("can see goal other");
-				if (distBall < 2) {
+					this.getPlayer().kick(20, dirGoalOther);
 					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-				} else {
-					if (!goingForBall)
-						getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
-				}
-			} else {
-				System.out.println("else");
-				if (distBall < 2) {
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-				} else {
-					if (!goingForBall)
-						getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
+					getPlayer().turnNeck(dirGoalOther);
 				}
 			}
+			/*
+			 * if (canSeeGoal || canSeePenalty) {
+			 * System.out.println("can see goal or penalty"); if (distBall < 2)
+			 * { getPlayer().turn(dirBall);
+			 * getPlayer().dash(randomDashValueFast()); } else {
+			 * getPlayer().turn(dirGoalOther);
+			 * getPlayer().dash(randomDashValueVeryFast()); } } else if
+			 * (canSeeGoalOther) { System.out.println("can see goal other"); if
+			 * (distBall < 2) { getPlayer().turn(dirBall);
+			 * getPlayer().dash(randomDashValueFast()); } else { if
+			 * (!goingForBall) getPlayer().turn(90);
+			 * getPlayer().dash(randomDashValueFast()); } } else {
+			 * System.out.println("else"); if (distBall < 2) {
+			 * getPlayer().turn(dirBall);
+			 * getPlayer().dash(randomDashValueFast()); } else { if
+			 * (!goingForBall) getPlayer().turn(90);
+			 * getPlayer().dash(randomDashValueFast()); } }
+			 */
 		} else {
-			if (!canSeeGoal && !needsToRetreat) {
+			if (canSeeBall) {
+				getPlayer().turn(dirBall);
+				getPlayer().turnNeck(dirGoalOther);
+				getPlayer().dash(randomDashValueFast());
+			} else if (!canSeeGoal && !needsToRetreat) {
 				if (!canSeePenalty) {
 					getPlayer().turn(90);
 					getPlayer().dash(randomDashValueFast());
@@ -367,6 +380,7 @@ public class AttackerManager implements ControllerPlayer {
 	public void infoSeePlayerOther(int number, boolean goalie, double distance,
 			double direction, double distChange, double dirChange,
 			double bodyFacingDirection, double headFacingDirection) {
+		distanceOtherPlayer = distance;
 	}
 
 	/** {@inheritDoc} */
@@ -374,6 +388,9 @@ public class AttackerManager implements ControllerPlayer {
 	public void infoSeePlayerOwn(int number, boolean goalie, double distance,
 			double direction, double distChange, double dirChange,
 			double bodyFacingDirection, double headFacingDirection) {
+		distanceOwnPlayer = distance;
+		directionOwnPlayer = direction;
+		distanceBallOwnPlayer = Math.sqrt((distBall * distBall) + (distanceOwnPlayer * distanceOwnPlayer));
 	}
 
 	/** {@inheritDoc} */
