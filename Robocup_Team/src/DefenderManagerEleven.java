@@ -43,6 +43,11 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private double dirMultiplier = 1.0;
 	private double goalTurn;
 	private boolean needsToRetreat = false;
+	//mah code
+	private boolean canSeeFlagRight = false;
+	private boolean canSeeFlagLeft = false;
+	private double distFlagRight = 0;
+	private double distFlagLeft = 0;
 
 	public DefenderManagerEleven() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -65,60 +70,75 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		if (distBall < 15) {
-			if (distBall < 0.7) {
-				if (canSeeGoal || canSeePenalty)
-					this.getPlayer().catchBall(dirBall);
-
-				if (canSeeGoal)
-					this.getPlayer().kick(60, 135);
-				else
-					this.getPlayer().kick(60, 0);
-			} else if (canSeeGoal || canSeePenalty) {
-				if (distBall < 2) {
-					needsToRetreat = true;
-
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-				} else {
-					needsToRetreat = true;
-
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueVeryFast());
-				}
-			}
-		} else {
-			if (!canSeeGoal && !needsToRetreat) {
-				if (!canSeePenalty) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
-				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {
-					getPlayer().turn(-1.0 * goalTurn);
-					getPlayer().dash(randomDashValueSlow());
-				} else
-					getPlayer().turn(25 * dirMultiplier);
-			} else {
-				if (!canSeeGoal) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueSlow());
-				} else if (distGoal > 3.5) {
-					if (!alreadySeeingGoal) {
-						getPlayer().turn(dirOwnGoal);
-						alreadySeeingGoal = true;
-					}
-
-					getPlayer().dash(randomDashValueVeryFast());
-				} else {
-					needsToRetreat = false;
-
-					if (alreadySeeingGoal) {
-						getPlayer().turn(goalTurn);
-						alreadySeeingGoal = false;
-					} else
-						alreadySeeingGoal = true;
-				}
+		if (canSeeFlagLeft) {
+			if(distFlagLeft < 10){
+				getPlayer().turn(90);
+				getPlayer().dash(randomDashValueSlow());
 			}
 		}
+		else if (canSeeFlagRight) {
+			if(distFlagRight < 10){
+				getPlayer().turn(90);
+				getPlayer().dash(randomDashValueSlow());
+			}
+		}
+		else {
+			
+		}
+//		if (distBall < 15) {
+//			if (distBall < 0.7) {
+//				if (canSeeGoal || canSeePenalty)
+//					this.getPlayer().catchBall(dirBall);
+//
+//				if (canSeeGoal)
+//					this.getPlayer().kick(60, 135);
+//				else
+//					this.getPlayer().kick(60, 0);
+//			} else if (canSeeGoal || canSeePenalty) {
+//				if (distBall < 2) {
+//					needsToRetreat = true;
+//
+//					getPlayer().turn(dirBall);
+//					getPlayer().dash(randomDashValueFast());
+//				} else {
+//					needsToRetreat = true;
+//
+//					getPlayer().turn(dirBall);
+//					getPlayer().dash(randomDashValueVeryFast());
+//				}
+//			}
+//		} else {
+//			if (!canSeeGoal && !needsToRetreat) {
+//				if (!canSeePenalty) {
+//					getPlayer().turn(90);
+//					getPlayer().dash(randomDashValueFast());
+//				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {
+//					getPlayer().turn(-1.0 * goalTurn);
+//					getPlayer().dash(randomDashValueSlow());
+//				} else
+//					getPlayer().turn(25 * dirMultiplier);
+//			} else {
+//				if (!canSeeGoal) {
+//					getPlayer().turn(90);
+//					getPlayer().dash(randomDashValueSlow());
+//				} else if (distGoal > 3.5) {
+//					if (!alreadySeeingGoal) {
+//						getPlayer().turn(dirOwnGoal);
+//						alreadySeeingGoal = true;
+//					}
+//
+//					getPlayer().dash(randomDashValueVeryFast());
+//				} else {
+//					needsToRetreat = false;
+//
+//					if (alreadySeeingGoal) {
+//						getPlayer().turn(goalTurn);
+//						alreadySeeingGoal = false;
+//					} else
+//						alreadySeeingGoal = true;
+//				}
+//			}
+//		}
 	}
 
 	/** {@inheritDoc} */
@@ -197,11 +217,15 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		canSeeFlagRight = true;
+		distFlagRight = distance;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		canSeeFlagLeft = true;
+		distFlagLeft = distance;
 	}
 
 	/** {@inheritDoc} */
