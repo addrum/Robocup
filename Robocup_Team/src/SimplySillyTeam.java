@@ -35,7 +35,11 @@ public class SimplySillyTeam extends AbstractTeam {
             return new GoalieManager();
         else if (number == 1)
         	return new AttackerManager();
-        else 
+        else if (number == 10)
+        	return new DefenderManagerTen();
+        else if (number == 11)
+        	return new DefenderManagerEleven();
+        else
             return new Simple();
     }
 
