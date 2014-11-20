@@ -171,7 +171,7 @@ public class DefenderManagerTen implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public String getType() {
-		return "Goalie";
+		return "Defender";
 	}
 
 	/** {@inheritDoc} */
