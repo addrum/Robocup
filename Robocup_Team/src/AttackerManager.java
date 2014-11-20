@@ -22,19 +22,21 @@ import java.util.Random;
  * <p>
  * Silly class.
  * </p>
- *
+ * 
  * @author Atan
  */
 public class AttackerManager implements ControllerPlayer {
 	private double distBall = 1000;
 	private double dirBall = 0;
 	private double dirOwnGoal = 0;
-	private double dirGoalOther = -1.0;
+	private double dirGoalOther = 180;
 	private double distGoal = -1.0;
 	private double distGoalOther = 1.0;
 	private double sidelineDistance;
-	private boolean canSeeGoal, canSeeGoalOther, canSeeBall, canSeeSideline, dribble, canSeePenalty, alreadySeeingGoal, canSeeFieldEnd, canSeeGoalRight, canSeeGoalRightOther, canSeeGoalLeft,
-			canSeeGoalLeftOther = false;
+	private boolean canSeeGoal, canSeeGoalOther, canSeeSideline, dribble,
+			canSeePenalty, alreadySeeingGoal, canSeeFieldEnd, canSeeGoalRight,
+			canSeeGoalRightOther, canSeeGoalLeft, canSeeGoalLeftOther,
+			needsToRetreat, canSeeBall, goingForBall = false;
 	private ActionsPlayer player;
 	private Random random = null;
 	private static int count = 0;
@@ -62,6 +64,7 @@ public class AttackerManager implements ControllerPlayer {
 		canSeeFieldEnd = false;
 		canSeeSideline = false;
 		canSeeBall = false;
+		goingForBall = false;
 		dribble = false;
 		goalTurn = 0.0;
 	}
@@ -70,66 +73,92 @@ public class AttackerManager implements ControllerPlayer {
 	@Override
 	public void postInfo() {
 		if (distBall < 15) {
-			canSeeBall = true;
+			if (canSeeBall) {
+				getPlayer().turn(dirBall);
+				getPlayer().dash(randomDashValueFast());
+				goingForBall = true;
+			}
 			if (distBall < 0.7) {
-				// set dribble to true if this guy is closest to ball
-				dribble = true;
+				if (canSeeBall) {
+					getPlayer().turn(dirBall);
+					getPlayer().dash(randomDashValueFast());
+					goingForBall = true;
+				}
+				System.out.println(goingForBall);
 				if (canSeeGoal)
 					this.getPlayer().kick(60, 135);
-				else if (canSeeGoalOther)
-					if (distGoalOther < 5)
-						this.getPlayer().kick(60, dirGoalOther);
-					else {
-						this.getPlayer().kick(60, dirGoalOther);
-					}
+				else if (canSeeGoalOther) {
+					this.getPlayer().kick(60, dirGoalOther);
+				} else {
+					this.getPlayer().kick(60, dirGoalOther);
+				}
 			} else if (canSeeGoal || canSeePenalty) {
-				if (distBall < 2) {
+				System.out.println("can see goal or penalty");
+				if (distBall < 10) {
 					getPlayer().turn(dirBall);
 					getPlayer().dash(randomDashValueFast());
 				} else {
-					getPlayer().turn(dirOwnGoal);
+					getPlayer().turn(dirGoalOther);
 					getPlayer().dash(randomDashValueVeryFast());
 				}
 			} else if (canSeeGoalOther) {
+				System.out.println("can see goal other");
 				if (distBall < 2) {
 					getPlayer().turn(dirBall);
 					getPlayer().dash(randomDashValueFast());
 				} else {
-					getPlayer().turn(90);
+					if (!goingForBall)
+						getPlayer().turn(90);
 					getPlayer().dash(randomDashValueFast());
 				}
 			} else {
+				System.out.println("else");
 				if (distBall < 2) {
 					getPlayer().turn(dirBall);
 					getPlayer().dash(randomDashValueFast());
 				} else {
-					getPlayer().turn(90);
+					if (!goingForBall)
+						getPlayer().turn(90);
 					getPlayer().dash(randomDashValueFast());
 				}
 			}
 		} else {
-			if (!canSeeBall) {
-				if (distGoal < 500) {
-					getPlayer().turn(dirGoalOther);
-					getPlayer().dash(randomDashValueSlow());
-				} else {
+			if (!canSeeGoal && !needsToRetreat) {
+				if (!canSeePenalty) {
+					getPlayer().turn(90);
 					getPlayer().dash(randomDashValueFast());
-				}
+				} else if ((canSeeGoalLeft || canSeeGoalRight)
+						&& !canSeeFieldEnd) {
+					getPlayer().turn(-1.0 * goalTurn);
+					getPlayer().dash(randomDashValueSlow());
+				} else
+					getPlayer().turn(25 * dirMultiplier);
 			} else {
-				if (distBall < 15) {
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-				} else {
-					getPlayer().turn(dirGoalOther);
+				if (!canSeeGoalOther) {
+					getPlayer().turn(90);
 					getPlayer().dash(randomDashValueSlow());
+				} else if (distGoalOther > 50) {
+					if (!alreadySeeingGoal) {
+						getPlayer().turn(dirGoalOther);
+						alreadySeeingGoal = true;
+					}
+
+					getPlayer().dash(randomDashValueVeryFast());
+				} else {
+					needsToRetreat = false;
+
+					if (alreadySeeingGoal) {
+						getPlayer().turn(goalTurn);
+						alreadySeeingGoal = false;
+					} else
+						alreadySeeingGoal = true;
 				}
 			}
 		}
 		if (sidelineDistance < 10) {
-			if (!canSeeBall) {
+			if (!goingForBall)
 				getPlayer().turn(90);
-				getPlayer().dash(randomDashValueSlow());
-			}
+			getPlayer().dash(randomDashValueSlow());
 		}
 	}
 
@@ -147,14 +176,18 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeLine(Line line, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeLine(Line line, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 		canSeeSideline = true;
 		sidelineDistance = distance;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeBall(double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeBall(double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 		distBall = distance;
 		dirBall = direction;
 		canSeeBall = true;
@@ -179,8 +212,11 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSenseBody(ViewQuality viewQuality, ViewAngle viewAngle, double stamina, double unknown, double effort, double speedAmount, double speedDirection, double headAngle, int kickCount,
-			int dashCount, int turnCount, int sayCount, int turnNeckCount, int catchCount, int moveCount, int changeViewCount) {
+	public void infoSenseBody(ViewQuality viewQuality, ViewAngle viewAngle,
+			double stamina, double unknown, double effort, double speedAmount,
+			double speedDirection, double headAngle, int kickCount,
+			int dashCount, int turnCount, int sayCount, int turnNeckCount,
+			int catchCount, int moveCount, int changeViewCount) {
 	}
 
 	/** {@inheritDoc} */
@@ -211,54 +247,74 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagRight(Flag flag, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagLeft(Flag flag, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagOwn(Flag flag, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 		canSeeFieldEnd = true;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagOther(Flag flag, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCenter(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagCenter(Flag flag, double distance, double direction,
+			double distChange, double dirChange, double bodyFacingDirection,
+			double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCornerOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagCornerOwn(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagCornerOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagCornerOther(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagPenaltyOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagPenaltyOwn(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 		canSeePenalty = true;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagPenaltyOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagPenaltyOther(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagGoalOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagGoalOwn(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 		if (!alreadySeeingGoal)
 			dirMultiplier *= -1.0;
 
@@ -282,7 +338,9 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeeFlagGoalOther(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeeFlagGoalOther(Flag flag, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 		if (!alreadySeeingGoal)
 			dirMultiplier *= -1.0;
 
@@ -306,26 +364,39 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeePlayerOther(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeePlayerOther(int number, boolean goalie, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+	public void infoSeePlayerOwn(int number, boolean goalie, double distance,
+			double direction, double distChange, double dirChange,
+			double bodyFacingDirection, double headFacingDirection) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoPlayerParam(double allowMultDefaultType, double dashPowerRateDeltaMax, double dashPowerRateDeltaMin, double effortMaxDeltaFactor, double effortMinDeltaFactor,
-			double extraStaminaDeltaMax, double extraStaminaDeltaMin, double inertiaMomentDeltaFactor, double kickRandDeltaFactor, double kickableMarginDeltaMax, double kickableMarginDeltaMin,
-			double newDashPowerRateDeltaMax, double newDashPowerRateDeltaMin, double newStaminaIncMaxDeltaFactor, double playerDecayDeltaMax, double playerDecayDeltaMin, double playerTypes,
-			double ptMax, double randomSeed, double staminaIncMaxDeltaFactor, double subsMax) {
+	public void infoPlayerParam(double allowMultDefaultType,
+			double dashPowerRateDeltaMax, double dashPowerRateDeltaMin,
+			double effortMaxDeltaFactor, double effortMinDeltaFactor,
+			double extraStaminaDeltaMax, double extraStaminaDeltaMin,
+			double inertiaMomentDeltaFactor, double kickRandDeltaFactor,
+			double kickableMarginDeltaMax, double kickableMarginDeltaMin,
+			double newDashPowerRateDeltaMax, double newDashPowerRateDeltaMin,
+			double newStaminaIncMaxDeltaFactor, double playerDecayDeltaMax,
+			double playerDecayDeltaMin, double playerTypes, double ptMax,
+			double randomSeed, double staminaIncMaxDeltaFactor, double subsMax) {
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void infoPlayerType(int id, double playerSpeedMax, double staminaIncMax, double playerDecay, double inertiaMoment, double dashPowerRate, double playerSize, double kickableMargin,
-			double kickRand, double extraStamina, double effortMax, double effortMin) {
+	public void infoPlayerType(int id, double playerSpeedMax,
+			double staminaIncMax, double playerDecay, double inertiaMoment,
+			double dashPowerRate, double playerSize, double kickableMargin,
+			double kickRand, double extraStamina, double effortMax,
+			double effortMin) {
 	}
 
 	/** {@inheritDoc} */

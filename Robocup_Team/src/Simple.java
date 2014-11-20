@@ -259,8 +259,8 @@ public class Simple implements ControllerPlayer {
 				break;
 			default:
 				throw new Error("number must be initialized before move");
-			}*/
-			this.getPlayer().turn(directionOtherGoal);
+			}
+			this.getPlayer().turn(directionOtherGoal);*/
 		}
 	}
 
@@ -347,7 +347,9 @@ public class Simple implements ControllerPlayer {
 					getPlayer().turn(directionBall);
 					getPlayer().dash(randomDashValueVeryFast());
 					while (dribble) {
-						getPlayer().kick(20, directionOtherGoal);
+						if (distanceOtherGoal < 10)
+							break;
+						getPlayer().kick(30, directionOtherGoal);
 					}
 					getPlayer().kick(50, directionOtherGoal);
 				}
