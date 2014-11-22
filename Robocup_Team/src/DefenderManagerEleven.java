@@ -45,12 +45,12 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private boolean needsToRetreat = false;
 	//mah code
 	private boolean canSeeFlagLeft = false;
-	private double distFlagLeft = 0;
-	private double dirFlagLeft = 0;	
 	private boolean canSeeCenter = false;
-	private double dirGoalCenter = 0;
 	private boolean canSeeBall = false;
 	private boolean canSeeOwnPlayer = false;
+	private double distFlagLeft = 0;
+	private double dirFlagLeft = 0;
+	private double dirGoalCenter = 0;
 	private double dirOwnPlayer = 0;
 
 	public DefenderManagerEleven() {
@@ -71,12 +71,12 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		goalTurn = 0.0;
 		//mah preinfo code
 		canSeeFlagLeft = false;
-		distFlagLeft = 0;
-		dirFlagLeft = 0;
-		canSeeCenter = false;
-		dirGoalCenter = 0;
+		canSeeCenter = false;		
 		canSeeBall = false;
 		canSeeOwnPlayer = false;
+		distFlagLeft = 0;
+		dirFlagLeft = 0;
+		dirGoalCenter = 0;
 		dirOwnPlayer = 0;
 	}
 
