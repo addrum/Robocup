@@ -45,11 +45,14 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private boolean needsToRetreat = false;
 	//mah code
 	private boolean canSeeFlagLeft = false;
+	private boolean canSeeFlagRight = false;
 	private boolean canSeeCenter = false;
 	private boolean canSeeBall = false;
 	private boolean canSeeOwnPlayer = false;
 	private double distFlagLeft = 0;
 	private double dirFlagLeft = 0;
+	private double distFlagRight = 0;
+	private double dirFlagRight = 0;	
 	private double dirGoalCenter = 0;
 	private double dirOwnPlayer = 0;
 
@@ -71,11 +74,14 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		goalTurn = 0.0;
 		//mah preinfo code
 		canSeeFlagLeft = false;
+		canSeeFlagRight = false;
 		canSeeCenter = false;		
 		canSeeBall = false;
 		canSeeOwnPlayer = false;
 		distFlagLeft = 0;
+		distFlagRight = 0;
 		dirFlagLeft = 0;
+		dirFlagRight = 0;
 		dirGoalCenter = 0;
 		dirOwnPlayer = 0;
 	}
@@ -238,6 +244,9 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		canSeeFlagRight = true;
+		distFlagRight = distance;
+		dirFlagRight = direction;
 	}
 
 	/** {@inheritDoc} */
