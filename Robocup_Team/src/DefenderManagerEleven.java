@@ -44,10 +44,14 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private double goalTurn;
 	private boolean needsToRetreat = false;
 	//mah code
-	private boolean canSeeFlagRight = false;
 	private boolean canSeeFlagLeft = false;
-	private double distFlagRight = 0;
 	private double distFlagLeft = 0;
+	private double dirFlagLeft = 0;	
+	private boolean canSeeCenter = false;
+	private double dirGoalCenter = 0;
+	private boolean canSeeBall = false;
+	private boolean canSeeOwnPlayer = false;
+	private double dirOwnPlayer = 0;
 
 	public DefenderManagerEleven() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -65,26 +69,42 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		canSeePenalty = false;
 		canSeeFieldEnd = false;
 		goalTurn = 0.0;
+		//mah preinfo code
+		canSeeFlagLeft = false;
+		distFlagLeft = 0;
+		dirFlagLeft = 0;
+		canSeeCenter = false;
+		dirGoalCenter = 0;
+		canSeeBall = false;
+		canSeeOwnPlayer = false;
+		dirOwnPlayer = 0;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		if (canSeeFlagLeft) {
-			if(distFlagLeft < 10){
-				getPlayer().turn(90);
+		if(canSeeBall){
+			if(distBall < 15) {
+				if(distBall < 0.7) {					
+					if(canSeeFlagLeft) {					
+						getPlayer().turn(90);
+					} else if(canSeeCenter) {
+						getPlayer().kick(100, dirGoalCenter);
+					} else if(canSeeOwnPlayer) {
+						getPlayer().kick(30, dirOwnPlayer);
+					}
+				} else {
+					getPlayer().turn(dirBall);
+					getPlayer().dash(randomDashValueFast());
+				}
+			}
+			else {
 				getPlayer().dash(randomDashValueSlow());
 			}
+		} else {
+			getPlayer().turn(10);
 		}
-		else if (canSeeFlagRight) {
-			if(distFlagRight < 10){
-				getPlayer().turn(90);
-				getPlayer().dash(randomDashValueSlow());
-			}
-		}
-		else {
-			
-		}
+		
 //		if (distBall < 15) {
 //			if (distBall < 0.7) {
 //				if (canSeeGoal || canSeePenalty)
@@ -163,6 +183,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	public void infoSeeBall(double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		distBall = distance;
 		dirBall = direction;
+		canSeeBall = true;
 	}
 
 	/** {@inheritDoc} */
@@ -217,8 +238,6 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
-		canSeeFlagRight = true;
-		distFlagRight = distance;
 	}
 
 	/** {@inheritDoc} */
@@ -226,6 +245,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeFlagLeft = true;
 		distFlagLeft = distance;
+		dirFlagLeft = direction;
 	}
 
 	/** {@inheritDoc} */
@@ -242,6 +262,11 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagCenter(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		if(flag.compareTo(Flag.CENTER) == 0) {			
+			canSeeCenter = true;
+			dirGoalCenter = direction;
+		}
+		
 	}
 
 	/** {@inheritDoc} */
@@ -302,6 +327,8 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		canSeeOwnPlayer = true;
+		dirOwnGoal = direction;
 	}
 
 	/** {@inheritDoc} */
