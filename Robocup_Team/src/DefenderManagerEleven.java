@@ -90,25 +90,32 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	@Override
 	public void postInfo() {
 		if(canSeeBall){
-			if(distBall < 15) {
-				if(distBall < 0.7) {					
-					if(canSeeFlagLeft) {					
-						getPlayer().turn(90);
-					} else if(canSeeCenter) {
+			if(distBall < 20) {
+				if(distBall < 0.7) {
+					if(canSeeCenter) {						
 						getPlayer().kick(100, dirGoalCenter);
 					} else if(canSeeOwnPlayer) {
-						getPlayer().kick(30, dirOwnPlayer);
+						getPlayer().kick(20, dirOwnPlayer);
+					} else if(canSeeFlagLeft && !canSeeCenter && !canSeeFieldEnd) {					
+						getPlayer().kick(100, dirGoalCenter);
+					} else if(canSeeFlagRight && !canSeeCenter && !canSeeFieldEnd) {
+						getPlayer().kick(100, dirGoalCenter);
 					}
 				} else {
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
+					if(canSeeFlagLeft && !canSeeCenter && !canSeeFieldEnd) {					
+						getPlayer().turn(90);
+					} else if(canSeeFlagRight && !canSeeCenter && !canSeeFieldEnd) {
+						getPlayer().turn(180);
+					} else {
+						getPlayer().turn(dirBall);
+						getPlayer().dash(randomDashValueVeryFast());
+					}
 				}
-			}
-			else {
-				getPlayer().dash(randomDashValueSlow());
-			}
-		} else {
-			getPlayer().turn(10);
+			} else {
+				getPlayer().dash(randomDashValueVeryFast());
+			}	
+		} else {			
+			getPlayer().turn(20);			
 		}
 		
 //		if (distBall < 15) {
