@@ -38,7 +38,6 @@ public class Simple implements ControllerPlayer {
 	private boolean canSeeOwnGoal = false;
 	private boolean canSeeNothing = true;
 	private boolean canSeeBall = false;
-	private boolean dribble = false;
 	private double directionBall;
 	private double directionOwnGoal = -1.0;
 	private double directionOtherGoal = 0;
@@ -51,6 +50,22 @@ public class Simple implements ControllerPlayer {
 	private double distanceOtherPlayer;
 	private double distanceBallOwnPlayer;
 	private ActionsPlayer player;
+	private boolean canSeeGoal;
+	private boolean canSeeGoalOther;
+	// the distance from this player to the ball
+	private double distBall = 1000;
+	// the direction from this player to the ball
+	private double dirBall = 0;
+	// the direction from this player to the own goal
+	private double dirOwnGoal = 0;
+	// the direction from this player to the other goal
+	private double dirGoalOther = 0;
+	// the distance from this player to the own goal
+	private double distGoal = -1.0;
+	// the distance from this player to the other goal
+	private double distGoalOther = 1.0;
+	// the distance from this player to the sidelines
+	private double sidelineDistance;
 
 	/**
 	 * Constructs a new simple client.
@@ -75,15 +90,23 @@ public class Simple implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void preInfo() {
+		// reset values to default so they can be updated correctly on each tick
 		canSeeOwnGoal = false;
 		canSeeBall = false;
 		canSeeNothing = true;
+		distBall = 1000;
+		distGoal = 1000;
+		distGoalOther = 1000;
+		dirGoalOther = 90;
+		canSeeGoal = false;
+		canSeeGoalOther = false;
+		canSeeBall = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		/*if (canSeeNothing) {
+		if (canSeeNothing) {
 		} else if (canSeeOwnGoal) {
 			if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {
 				canSeeOwnGoalAction();
@@ -99,14 +122,13 @@ public class Simple implements ControllerPlayer {
 
 		} else if (canSeeBall) {
 			if (distanceOtherPlayer < 10) {
-				dribble = false;
 				canSeeBallAction(directionOwnPlayer);
 			} else {
 				canSeeBallAction(directionOtherGoal);
 			}
 		} else {
 			canSeeAnythingAction();
-		}*/
+		}
 	}
 
 	/** {@inheritDoc} */
@@ -200,7 +222,7 @@ public class Simple implements ControllerPlayer {
 	public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		this.distanceOwnPlayer = distance;
 		this.directionOwnPlayer = direction;
-		this.directionToTurn = 180;
+		this.directionToTurn = 90;
 		this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall) + (distanceOwnPlayer * distanceOwnPlayer));
 	}
 
@@ -226,9 +248,6 @@ public class Simple implements ControllerPlayer {
 			switch (this.getPlayer().getNumber()) {
 			case 1:
 				this.getPlayer().move(-50, 0);
-				break;
-			case 3:
-				this.getPlayer().move(-10, -10);
 				break;
 			case 4:
 				this.getPlayer().move(-20, 0);
@@ -332,22 +351,51 @@ public class Simple implements ControllerPlayer {
 	 */
 	private void canSeeBallAction(double direction) {
 		if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer < distanceBall)) {
-			dribble = false;
-			getPlayer().turn(directionToTurn);
+			getPlayer().turn(dirOwnGoal);
 			getPlayer().dash(this.randomDashValueSlow());
 		} else if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer > distanceBall)) {
 			getPlayer().turn(directionBall);
 			getPlayer().dash(this.randomDashValueFast());
 			if (distanceBall < 10) {
 				if (distanceBall < 0.7) {
-					getPlayer().turn(directionBall);
-					getPlayer().dash(randomDashValueVeryFast());
-					while (dribble) {
-						if (distanceOtherGoal < 10)
-							break;
-						getPlayer().kick(30, directionOtherGoal);
+					// if he is, can he see the goal?
+					if (canSeeGoal) {
+						// if he can, is he less than 20 to his own goal?
+						if (distGoal < 20) {
+							// if he is, kick it hard away from the goal
+							this.getPlayer().kick(60, 135);
+						} else {
+							// if he isn't, dribble the ball towards the other goal so he doesn't give away possession
+							this.getPlayer().kick(20, dirGoalOther);
+						}
+						// turn towards the ball and face the other goal regardless if what happens
+						getPlayer().turn(dirBall);
+						getPlayer().turnNeck(dirGoalOther);
+					// if he can't, can he see the other goal?
+					} else if (canSeeGoalOther) {
+						// if he can, is he less than 23 to the other goal?
+						if (distGoalOther < 23) {
+							// if he is, kick the ball as hard as he can towards the other goal to try and score
+							this.getPlayer().kick(100, dirGoalOther);
+						} else {
+							// if he isn't, is he less than 2 from a player on the other team?
+							if (distanceOtherPlayer < 2) {
+								// if he is, attempt to pass in the direction of his own team
+								this.getPlayer().kick(50, directionOwnPlayer);
+							} else {
+								// if he isn't, dribble towards the other goal so he doesn't give away possession
+								this.getPlayer().kick(20, dirGoalOther);
+							}
+						}
+						// turn towards the ball and face the other goal regardless if what happens
+						getPlayer().turn(dirBall);
+						getPlayer().turnNeck(dirGoalOther);
+					} else {
+						// if he can't see his own goal, or the other goal,  turn towards the ball and face the other goal regardless if what happens
+						this.getPlayer().kick(20, dirGoalOther);
+						getPlayer().turn(dirBall);
+						getPlayer().turnNeck(dirGoalOther);
 					}
-					getPlayer().kick(50, directionOtherGoal);
 				}
 			}
 		} else {
