@@ -257,7 +257,6 @@ public class Simple implements ControllerPlayer {
 			default:
 				throw new Error("number must be initialized before move");
 			}
-			//this.getPlayer().turn(directionOtherGoal);
 		}
 	}
 
