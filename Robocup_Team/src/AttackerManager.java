@@ -65,6 +65,8 @@ public class AttackerManager implements ControllerPlayer {
 	private double distanceBallOwnPlayer;
 	// the distance from this player to a player on the other team
 	private double distanceOtherPlayer;
+	private boolean canSeeFlagRight;
+	private boolean canSeeFlagLeft;
 
 	public AttackerManager() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -91,6 +93,8 @@ public class AttackerManager implements ControllerPlayer {
 		canSeeSideline = false;
 		canSeeBall = false;
 		goingForBall = false;
+		canSeeFlagLeft = false;
+		canSeeFlagRight = false;
 		dribble = false;
 		goalTurn = 0.0;
 	}
@@ -104,15 +108,22 @@ public class AttackerManager implements ControllerPlayer {
 			if (canSeeBall) {
 				// if he can, turn towards the ball, face the other goal, dash
 				// towards the ball, and set going for ball true
-				if (distanceBallOwnPlayer > 8) {
+				if (distanceOwnPlayer < 8) {
+					if (distanceBallOwnPlayer > distBall) {
+						getPlayer().turn(dirBall);
+						getPlayer().turnNeck(dirGoalOther);
+						getPlayer().dash(randomDashValueVeryFast());
+						goingForBall = true;
+					} else {
+						getPlayer().turn(90);
+						getPlayer().turnNeck(dirBall);
+						getPlayer().dash(randomDashValueFast());
+						goingForBall = false;
+					}
+				} else {
 					getPlayer().turn(dirBall);
 					getPlayer().turnNeck(dirGoalOther);
 					getPlayer().dash(randomDashValueVeryFast());
-					goingForBall = true;
-				} else {
-					getPlayer().turn(dirGoalOther);
-					getPlayer().turnNeck(dirBall);
-					getPlayer().dash(randomDashValueFast());
 				}
 			}
 			// if he is, is he less than 0.7 to the ball?
@@ -138,19 +149,21 @@ public class AttackerManager implements ControllerPlayer {
 					if (distGoalOther < 23) {
 						// if he is, kick the ball as hard as he can towards the
 						// other goal to try and score
+						getPlayer().turnNeck(dirGoalOther);
+						getPlayer().turn(dirGoalOther);
 						this.getPlayer().kick(100, dirGoalOther);
 					} else {
 						// if he isn't, is he less than 2 from a player on the
 						// other team?
-						if (distanceOtherPlayer < 2) {
+						/*if (distanceOtherPlayer < 2) {
 							// if he is, attempt to pass in the direction of his
 							// own team
 							this.getPlayer().kick(50, directionOwnPlayer);
-						} else {
+						} else {*/
 							// if he isn't, dribble towards the other goal so he
 							// doesn't give away possession
 							this.getPlayer().kick(20, dirGoalOther);
-						}
+						//}
 					}
 					// turn towards the ball and face the other goal regardless
 					// if what happens
@@ -341,11 +354,15 @@ public class AttackerManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save data for when the agent can see the left touchline of the field
+		canSeeFlagRight = true;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save data for when the agent can see the left touchline of the field
+		canSeeFlagLeft = true;
 	}
 
 	/** {@inheritDoc} */
