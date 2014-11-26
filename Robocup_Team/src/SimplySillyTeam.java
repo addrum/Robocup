@@ -32,6 +32,9 @@ public class SimplySillyTeam extends AbstractTeam {
     @Override
     //!!!IMPORTANT!!!
     //Instead of modifying the Simple.java file we decided to modify here which player gets which individual AI
+    //Numbers 9 and 10 (in-game 10 and 11) get to be the defenders
+    //While 1 and 2 (in-game 2 and 3) get to be attackers
+    //And 0 (in-game 1) is the goalie
     public ControllerPlayer getNewControllerPlayer(int number) {
         if (number == 0) 
             return new GoalieManager();
