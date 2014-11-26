@@ -173,7 +173,11 @@ public class AttackerManager implements ControllerPlayer {
 					// if he can't see his own goal, or the other goal, turn
 					// towards the ball and face the other goal regardless if
 					// what happens
-					this.getPlayer().kick(20, dirGoalOther);
+					if (canSeeFlagLeft) {
+						this.getPlayer().kick(20, 45);
+					} if (canSeeFlagRight) {
+						this.getPlayer().kick(20, -45);
+					}
 					getPlayer().turn(dirBall);
 					getPlayer().turnNeck(dirGoalOther);
 				}
