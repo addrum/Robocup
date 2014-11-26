@@ -132,7 +132,7 @@ public class DefenderManagerTen implements ControllerPlayer {
 	@Override
 	public void infoHearPlayMode(PlayMode playMode) {
 		if (playMode == PlayMode.BEFORE_KICK_OFF)
-			getPlayer().move(-40, -10);
+			getPlayer().move(-40, 10);
 	}
 
 	/** {@inheritDoc} */
