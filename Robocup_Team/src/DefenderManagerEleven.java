@@ -86,41 +86,36 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-//		if(canSeeBall){
-			if(distBall < 20) {
-				if(distBall < 0.7) {
-					if(canSeeCenter) {						
-						getPlayer().kick(100, dirCenter);
-					} else if(canSeeFlagLeft && !canSeeCenter) {					
-						getPlayer().kick(100, 90);
-					} else if(canSeeFlagRight && !canSeeCenter) {
-						getPlayer().kick(100, -90);
-					}
-				} else {					
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueVeryFast());					
-				}
-			} else {
-				if(canSeeCenter && distCenter < 40){
-					if(canSeePenaltyLeft) {
-						getPlayer().turn(dirPenaltyLeft);
-						getPlayer().dash(randomDashValueVeryFast());
-					} else if(canSeePenaltyRight) {
-						getPlayer().turn(dirPenaltyRight);
-						getPlayer().dash(randomDashValueVeryFast());
-					} else {
-						getPlayer().turn(90);						
-					}
-				} else if(canSeePenaltyLeft){										
-					getPlayer().dash(randomDashValueVeryFast());
-					getPlayer().turn(dirPenaltyLeft);
+		if(distBall < 20) {
+			if(distBall < 0.7) {
+				if(canSeeCenter) {						
+					getPlayer().kick(100, dirCenter);
+				} else if(canSeeFlagLeft && !canSeeCenter) {					
+					getPlayer().kick(100, 90);
+				} else if(canSeeFlagRight && !canSeeCenter) {
+					getPlayer().kick(100, -90);
 				} else {
-					getPlayer().turn(30);
+					getPlayer().kick(100, 180);
 				}
-			}	
-//		} else {			
-//			getPlayer().turn(30);				
-//		}
+			} else {					
+				getPlayer().turn(dirBall);
+				getPlayer().dash(randomDashValueVeryFast());					
+			}
+		} else {
+			if(canSeeCenter && distCenter < 55){
+				if(canSeePenaltyLeft && !canSeeBall) {
+					getPlayer().turn(dirPenaltyLeft);
+					getPlayer().dash(randomDashValueVeryFast());
+				} else if(distPenaltyLeft<1){
+					getPlayer().turn(90);						
+				}
+			} else if(canSeePenaltyLeft){										
+				getPlayer().dash(randomDashValueVeryFast());
+				getPlayer().turn(dirPenaltyLeft);
+			} else if(distPenaltyLeft<1){
+				getPlayer().turn(30);						
+			}
+		}	
 		
 //		if (distBall < 15) {
 //			if (distBall < 0.7) {
