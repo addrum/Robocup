@@ -29,8 +29,7 @@ import java.util.Random;
 public class DefenderManagerEleven implements ControllerPlayer {
 	private double distBall = 1000;
 	private double dirBall = 0;		
-	private boolean canSeePenaltyLeft = false;
-	private boolean canSeePenaltyRight = false;
+	private boolean canSeePenaltyLeft = false;	
 	private ActionsPlayer player;
 	private Random random = null;
 	private static int count = 0;	
@@ -47,9 +46,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private double distCenterRight = 0;
 	private double dirFlagLeft = 0;	
 	private double distPenaltyLeft = 0;
-	private double dirPenaltyLeft = 0;
-	private double distPenaltyRight = 0;
-	private double dirPenaltyRight = 0;
+	private double dirPenaltyLeft = 0;	
 	private double dirCenter = 0;
 	private double dirCenterLeft = 0;
 	private double dirCenterRight = 0;
@@ -63,8 +60,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	@Override
 	public void preInfo() {
 		distBall = 1000;
-		canSeePenaltyLeft = false;
-		canSeePenaltyRight = false;
+		canSeePenaltyLeft = false;		
 		canSeeFlagLeft = false;
 		canSeeFlagRight = false;
 		canSeeCenter = false;
@@ -74,13 +70,11 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		distFlagLeft = 0;		
 		distCenter = 0;
 		distPenaltyLeft = 0;
-		distPenaltyRight = 0;
 		dirFlagLeft = 0;		
 		dirCenter = 0;
 		dirCenterLeft = 0;
 		dirCenterRight = 0;
-		dirPenaltyLeft = 0;
-		dirPenaltyRight = 0;		
+		dirPenaltyLeft = 0;	
 	}
 
 	/** {@inheritDoc} */
@@ -115,62 +109,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 			} else if(distPenaltyLeft<1){
 				getPlayer().turn(30);						
 			}
-		}	
-		
-//		if (distBall < 15) {
-//			if (distBall < 0.7) {
-//				if (canSeeGoal || canSeePenalty)
-//					this.getPlayer().catchBall(dirBall);
-//
-//				if (canSeeGoal)
-//					this.getPlayer().kick(60, 135);
-//				else
-//					this.getPlayer().kick(60, 0);
-//			} else if (canSeeGoal || canSeePenalty) {
-//				if (distBall < 2) {
-//					needsToRetreat = true;
-//
-//					getPlayer().turn(dirBall);
-//					getPlayer().dash(randomDashValueFast());
-//				} else {
-//					needsToRetreat = true;
-//
-//					getPlayer().turn(dirBall);
-//					getPlayer().dash(randomDashValueVeryFast());
-//				}
-//			}
-//		} else {
-//			if (!canSeeGoal && !needsToRetreat) {
-//				if (!canSeePenalty) {
-//					getPlayer().turn(90);
-//					getPlayer().dash(randomDashValueFast());
-//				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {
-//					getPlayer().turn(-1.0 * goalTurn);
-//					getPlayer().dash(randomDashValueSlow());
-//				} else
-//					getPlayer().turn(25 * dirMultiplier);
-//			} else {
-//				if (!canSeeGoal) {
-//					getPlayer().turn(90);
-//					getPlayer().dash(randomDashValueSlow());
-//				} else if (distGoal > 3.5) {
-//					if (!alreadySeeingGoal) {
-//						getPlayer().turn(dirOwnGoal);
-//						alreadySeeingGoal = true;
-//					}
-//
-//					getPlayer().dash(randomDashValueVeryFast());
-//				} else {
-//					needsToRetreat = false;
-//
-//					if (alreadySeeingGoal) {
-//						getPlayer().turn(goalTurn);
-//						alreadySeeingGoal = false;
-//					} else
-//						alreadySeeingGoal = true;
-//				}
-//			}
-//		}
+		}			
 	}
 
 	/** {@inheritDoc} */
@@ -308,11 +247,6 @@ public class DefenderManagerEleven implements ControllerPlayer {
 			canSeePenaltyLeft = true;
 			dirPenaltyLeft = direction;
 			distPenaltyLeft = distance;
-		}
-		if(flag.compareTo(Flag.RIGHT)==0){
-			canSeePenaltyRight = true;
-			dirPenaltyRight = direction;
-			distPenaltyRight = distance;
 		}
 	}
 
