@@ -36,9 +36,9 @@ public class SimplySillyTeam extends AbstractTeam {
         else if (number == 1 || number == 2)
         	return new AttackerManager();
         else if (number == 9)
-        	return new DefenderManagerTen();
+        	return new DefenderManagerRight();
         else if (number == 10)
-        	return new DefenderManagerEleven();
+        	return new DefenderManagerLeft();
         else
             return new Simple();
     }
