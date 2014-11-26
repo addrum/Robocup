@@ -37,19 +37,11 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private boolean canSeeFlagLeft = false;
 	private boolean canSeeFlagRight = false;
 	private boolean canSeeCenter = false;
-	private boolean canSeeCenterLeft = false;
-	private boolean canSeeCenterRight = false;
-	private boolean canSeeBall = false;	
-	private double distFlagLeft = 0;	
-	private double distCenter = 0;
-	private double distCenterLeft = 0;
-	private double distCenterRight = 0;
-	private double dirFlagLeft = 0;	
+	private boolean canSeeBall = false;		
+	private double distCenter = 0;			
 	private double distPenaltyLeft = 0;
 	private double dirPenaltyLeft = 0;	
-	private double dirCenter = 0;
-	private double dirCenterLeft = 0;
-	private double dirCenterRight = 0;
+	private double dirCenter = 0;	
 
 	public DefenderManagerEleven() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -64,16 +56,10 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		canSeeFlagLeft = false;
 		canSeeFlagRight = false;
 		canSeeCenter = false;
-		canSeeCenterLeft = false;
-		canSeeCenterRight = false;
-		canSeeBall = false;		
-		distFlagLeft = 0;		
+		canSeeBall = false;					
 		distCenter = 0;
-		distPenaltyLeft = 0;
-		dirFlagLeft = 0;		
+		distPenaltyLeft = 0;		
 		dirCenter = 0;
-		dirCenterLeft = 0;
-		dirCenterRight = 0;
 		dirPenaltyLeft = 0;	
 	}
 
@@ -196,8 +182,6 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	@Override
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeFlagLeft = true;
-		distFlagLeft = distance;
-		dirFlagLeft = direction;
 	}
 
 	/** {@inheritDoc} */
@@ -217,16 +201,6 @@ public class DefenderManagerEleven implements ControllerPlayer {
 			canSeeCenter = true;
 			dirCenter = direction;
 			distCenter = distance;
-		}
-		if(flag.compareTo(Flag.LEFT) ==0) {
-			canSeeCenterLeft = true;
-			dirCenterLeft = direction;
-			distCenterLeft = distCenterLeft;
-		}
-		if(flag.compareTo(Flag.RIGHT) ==0) {
-			canSeeCenterRight = true;
-			dirCenterRight = direction;
-			distCenterRight = distCenterLeft;
 		}
 	}
 
