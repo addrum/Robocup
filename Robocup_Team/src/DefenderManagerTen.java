@@ -217,7 +217,7 @@ public class DefenderManagerTen implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagPenaltyOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
-		if(flag.compareTo(Flag.LEFT)==0){
+		if(flag.compareTo(Flag.RIGHT)==0){
 			canSeePenaltyRight = true;
 			dirPenaltyRight = direction;
 			distPenaltyRight = distance;
