@@ -127,7 +127,7 @@ public class AttackerManager implements ControllerPlayer {
 				}
 			}
 			// if he is, is he less than 0.7 to the ball?
-			if (distBall < 0.7) {
+			if (distBall < 0.7 && goingForBall) {
 				// if he is, can he see the goal?
 				if (canSeeGoal) {
 					// if he can, is he less than 20 to his own goal?
