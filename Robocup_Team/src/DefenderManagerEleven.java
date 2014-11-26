@@ -38,15 +38,21 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	private boolean canSeeFlagLeft = false;
 	private boolean canSeeFlagRight = false;
 	private boolean canSeeCenter = false;
+	private boolean canSeeCenterLeft = false;
+	private boolean canSeeCenterRight = false;
 	private boolean canSeeBall = false;	
 	private double distFlagLeft = 0;	
 	private double distCenter = 0;
+	private double distCenterLeft = 0;
+	private double distCenterRight = 0;
 	private double dirFlagLeft = 0;	
 	private double distPenaltyLeft = 0;
 	private double dirPenaltyLeft = 0;
 	private double distPenaltyRight = 0;
 	private double dirPenaltyRight = 0;
-	private double dirGoalCenter = 0;	
+	private double dirCenter = 0;
+	private double dirCenterLeft = 0;
+	private double dirCenterRight = 0;
 
 	public DefenderManagerEleven() {
 		random = new Random(System.currentTimeMillis() + count);
@@ -61,16 +67,20 @@ public class DefenderManagerEleven implements ControllerPlayer {
 		canSeePenaltyRight = false;
 		canSeeFlagLeft = false;
 		canSeeFlagRight = false;
-		canSeeCenter = false;		
+		canSeeCenter = false;
+		canSeeCenterLeft = false;
+		canSeeCenterRight = false;
 		canSeeBall = false;		
 		distFlagLeft = 0;		
 		distCenter = 0;
 		distPenaltyLeft = 0;
 		distPenaltyRight = 0;
 		dirFlagLeft = 0;		
-		dirGoalCenter = 0;		
+		dirCenter = 0;
+		dirCenterLeft = 0;
+		dirCenterRight = 0;
 		dirPenaltyLeft = 0;
-		dirPenaltyRight = 0;
+		dirPenaltyRight = 0;		
 	}
 
 	/** {@inheritDoc} */
@@ -80,7 +90,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 			if(distBall < 20) {
 				if(distBall < 0.7) {
 					if(canSeeCenter) {						
-						getPlayer().kick(100, dirGoalCenter);
+						getPlayer().kick(100, dirCenter);
 					} else if(canSeeFlagLeft && !canSeeCenter) {					
 						getPlayer().kick(100, 90);
 					} 
@@ -89,7 +99,7 @@ public class DefenderManagerEleven implements ControllerPlayer {
 					getPlayer().dash(randomDashValueVeryFast());					
 				}
 			} else {
-				if(canSeeCenter && distCenter < 20){
+				if(canSeeCenter && distCenter < 40){
 					if(canSeePenaltyLeft) {
 						getPlayer().turn(dirPenaltyLeft);
 						getPlayer().dash(randomDashValueVeryFast());
@@ -270,9 +280,21 @@ public class DefenderManagerEleven implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagCenter(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
-		canSeeCenter = true;
-		dirGoalCenter = direction;
-		distCenter = distance;
+		if(flag.compareTo(Flag.CENTER) ==0){
+			canSeeCenter = true;
+			dirCenter = direction;
+			distCenter = distance;
+		}
+		if(flag.compareTo(Flag.LEFT) ==0) {
+			canSeeCenterLeft = true;
+			dirCenterLeft = direction;
+			distCenterLeft = distCenterLeft;
+		}
+		if(flag.compareTo(Flag.RIGHT) ==0) {
+			canSeeCenterRight = true;
+			dirCenterRight = direction;
+			distCenterRight = distCenterLeft;
+		}
 	}
 
 	/** {@inheritDoc} */
