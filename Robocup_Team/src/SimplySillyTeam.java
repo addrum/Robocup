@@ -30,6 +30,8 @@ public class SimplySillyTeam extends AbstractTeam {
      * The first controller of the team is the goalie and the others are players (11 is for the captain).
      */
     @Override
+    //!!!IMPORTANT!!!
+    //Instead of modifying the Simple.java file we decided to modify here which player gets which individual AI
     public ControllerPlayer getNewControllerPlayer(int number) {
         if (number == 0) 
             return new GoalieManager();
