@@ -113,68 +113,67 @@ public class Simple implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		/*if (canSeeNothing) {
-		} else if (canSeeOwnGoal) {
-			if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {
-				canSeeOwnGoalAction();
-			} else if (canSeeBall) {
-				if (distanceOwnPlayer < 10) {
-					if (distanceBallOwnPlayer < distanceBall) {
-						if (canSeeFlagLeft) {
-							getPlayer().turn(-45);
-						} else if (canSeeFlagRight) {
-							getPlayer().turn(45);
-						}
-					} else {
-						if (distanceOtherPlayer < 10) {
-							canSeeBallAction(directionOwnPlayer);
-						} else {
-							canSeeBallAction(directionOtherGoal);
-						}
-					}
-				} else {
-					if (distanceOtherPlayer < 10) {
-						canSeeBallAction(directionOwnPlayer);
-					} else {
-						canSeeBallAction(directionOtherGoal);
-					}
-				}
-			} else {
-				canSeeAnythingAction();
-			}
-
-		} else if (canSeeBall) {
-			if (distanceOtherPlayer < 10) {
-				canSeeBallAction(directionOwnPlayer);
-			} else {
-				canSeeBallAction(directionOtherGoal);
-			}
+		if (canSeeNothing) {											//if the agent can see nothing
+		} else if (canSeeOwnGoal) {										//if the agent can see his own goal
+			if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {		//|		if the distance to his own goal is between 10 and 20
+				canSeeOwnGoalAction();									//|		|	do appropriate defensive actions
+			} else if (canSeeBall) {									//|		if the distance is not between 10 and 20 and the agent can see the ball 
+				if (distanceOwnPlayer < 10) {							//|		|	if the distance to a team mate is less than 10
+					if (distanceBallOwnPlayer < distanceBall) {			//|		|	|	if the team mate is closer to the ball than the agent is
+						if (canSeeFlagLeft) {							//|		|	|	|	if the agent can see the left side of the goal
+							getPlayer().turn(-45);						//|		|	|	|	|	turn anti clockwise to face a more appropriate direction
+						} else if (canSeeFlagRight) {					//|		|	|	|	if the agent can see the right side of the goal
+							getPlayer().turn(45);						//|		|	|	|	|	turn clockwise to face a more appropriate direction		
+						}												//|		|	|	|
+					} else {											//|		|	|	if the agent is closer to the ball than the team mate is
+						if (distanceOtherPlayer < 10) {					//|		|	|	|	if the distance to an opponent is less than 10
+							canSeeBallAction(directionOwnPlayer);		//|		|	|	|	|	make appropriate ball actions in the direction of a team mate
+						} else {										//|		|	|	|	if the distance to an opponent is greater than 10
+							canSeeBallAction(directionOtherGoal);		//|		|	|	|	|	make appropriate ball actions in the direction of the other goal
+						}												//|		|	|	|
+					}													//|		|	|
+				} else {												//|		|	if the distance to a team mate is greater than 10
+					if (distanceOtherPlayer < 10) {						//|		|	|	if the distance to an opponent is less than 10	
+						canSeeBallAction(directionOwnPlayer);			//|		|	|	|	make appropriate ball actions in the direction of a team mate
+					} else {											//|		|	|	if the distance to an opponent is greater than 10
+						canSeeBallAction(directionOtherGoal);			//|		|	|	|	make appropriate ball actions in the direction of the other goal
+					}													//|		|	|
+				}														//|		|
+			} else {													//|		if the distance is not between 10 and 20 and the agent can't see the ball
+				canSeeAnythingAction();									//|		|	do appropriate actions for seeing something
+			}															//|		
+		} else if (canSeeBall) {										//if the agent can see the ball
+			if (distanceOtherPlayer < 10) {								//|		if the distance to an opponent is less than 10
+				canSeeBallAction(directionOwnPlayer);					//|		|	make appropriate ball actions in the direction of a team mate
+			} else {													//|		if the distance to an opponent is greater than 10
+				canSeeBallAction(directionOtherGoal);					//|		|	make appropriate ball actions in the direction of the other goal
+			}													
 		} else {
 			canSeeAnythingAction();
 		}
-		if (lineDistance < 10) {
-			if (canSeeFlagLeft) {
-				getPlayer().turn(-45);
-			} else if (canSeeFlagRight) {
-				getPlayer().turn(45);
-			} else {
-				getPlayer().turn(180);
+		if (lineDistance < 10) {										//if the distance to the edge of the pitch is less than 10
+			if (canSeeFlagLeft) {										//|		if the agent can see the left end of the pitch
+				getPlayer().turn(-45);									//|		|	turn anti-clockwise to face the rest of the pitch
+			} else if (canSeeFlagRight) {								//|		if the agent can see the right end of the pitch
+				getPlayer().turn(45);									//|		|	turn clockwise to face the rest of the pitch
+			} else {													//|		if the agent can't see the left or right end's of the pitch
+				getPlayer().turn(180);									//|		|	turn around completely to face the rest of the pitch
 			}
-		}*/
+		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
-		canSeeFlagRight = true;
+		canSeeFlagRight = true;		//set the flag to say the agent can see the right side of the pitch
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
-		canSeeFlagLeft = true;
+		canSeeFlagLeft = true;		//set the flag to say the agent can see the left side of the pitch
 	}
 
 	/** {@inheritDoc} */
@@ -228,7 +227,7 @@ public class Simple implements ControllerPlayer {
 			distanceOwnGoal = distance;
 			directionOwnGoal = direction;
 		}
-		distanceOtherGoal = 104 - distanceOwnGoal;
+		distanceOtherGoal = 104 - distanceOwnGoal;	// work ou the distance to the other goal
 	}
 
 	/** {@inheritDoc} */
@@ -256,10 +255,10 @@ public class Simple implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeePlayerOwn(int number, boolean goalie, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
-		this.distanceOwnPlayer = distance;
-		this.directionOwnPlayer = direction;
-		this.directionToTurn = 90;
-		this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall) + (distanceOwnPlayer * distanceOwnPlayer));
+		this.distanceOwnPlayer = distance;																				//set the distance to a team mate to the distance from the info
+		this.directionOwnPlayer = direction;																			//set the direction of a team mate to the direction from the info	
+		this.directionToTurn = 90;																						//set the amount the agent will turn to stop being too close to team mates
+		this.distanceBallOwnPlayer = Math.sqrt((distanceBall * distanceBall) + (distanceOwnPlayer * distanceOwnPlayer));//work out the distance of the team mate's distance to the ball based on a^2 = b^2 + c^2
 	}
 
 	/** {@inheritDoc} */
@@ -386,51 +385,38 @@ public class Simple implements ControllerPlayer {
 	 * involves running at it and kicking it...
 	 */
 	private void canSeeBallAction(double direction) {
-		if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer < distanceBall)) {
-			getPlayer().turn(dirOwnGoal);
-			getPlayer().dash(this.randomDashValueSlow());
-		} else if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer > distanceBall)) {
-			getPlayer().turn(directionBall);
-			getPlayer().dash(this.randomDashValueFast());
-			if (distanceBall < 10) {
-				if (distanceBall < 0.7) {
-					// if he is, can he see the goal?
-					if (canSeeGoal) {
-						// if he can, is he less than 20 to his own goal?
-						if (distGoal < 20) {
-							// if he is, kick it hard away from the goal
-							this.getPlayer().kick(60, 135);
-						} else {
-							// if he isn't, dribble the ball towards the other goal so he doesn't give away possession
-							this.getPlayer().kick(20, dirGoalOther);
-						}
-						// turn towards the ball and face the other goal regardless if what happens
-						getPlayer().turn(dirBall);
-						getPlayer().turnNeck(dirGoalOther);
-					// if he can't, can he see the other goal?
-					} else if (canSeeGoalOther) {
-						// if he can, is he less than 23 to the other goal?
-						if (distGoalOther < 23) {
-							// if he is, kick the ball as hard as he can towards the other goal to try and score
-							this.getPlayer().kick(100, dirGoalOther);
-						} else {
-							// if he isn't, is he less than 2 from a player on the other team?
-							if (distanceOtherPlayer < 2) {
-								// if he is, attempt to pass in the direction of his own team
-								this.getPlayer().kick(50, directionOwnPlayer);
-							} else {
-								// if he isn't, dribble towards the other goal so he doesn't give away possession
-								this.getPlayer().kick(20, dirGoalOther);
+		if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer < distanceBall)) {			//if the agent is less than 15 from his own team mate and the team mate is closer to the ball
+			getPlayer().turn(dirOwnGoal);												//|		turn to face the other goal to stay away from the team mate
+			getPlayer().dash(this.randomDashValueSlow());								//|		run slowly to save stamina
+		} else if (distanceOwnPlayer < 15 && (distanceBallOwnPlayer > distanceBall)) {	//if the agent is less than 15 from his own team mate but he is closer to the ball
+			getPlayer().turn(directionBall);											//|		face the ball
+			getPlayer().dash(this.randomDashValueFast());								//|		and dash quickly
+			if (distanceBall < 10) {													//|		if the agent is less than 10 from the ball
+				if (distanceBall < 0.7) {												//|		|	if the agent is less than 0.7 from the ball
+					if (canSeeGoal) {													//|		|	|	if he is, can he see the goal?
+						if (distGoal < 20) {											//|		|	|	|	if he can, is he less than 20 to his own goal?								
+							this.getPlayer().kick(60, 135);								//|		|	|	|	|	if he is, kick it hard away from the goal
+						} else {														//|		|	|	|	if he isn't, 						
+							this.getPlayer().kick(20, dirGoalOther);					//|		|	|	|	|	dribble the ball towards the other goal so he doesn't give away possession	
+						}																//|		|	|	|	
+						getPlayer().turn(dirBall);										//|		|	|	|	turn towards the ball 
+						getPlayer().turnNeck(dirGoalOther);								//|		|	|	|	and face the other goal regardless of what happens
+					} else if (canSeeGoalOther) {										//|		|	|	if he can't, can he see the other goal?					
+						if (distGoalOther < 23) {										//|		|	|	|	if he can, is he less than 23 to the other goal?
+							this.getPlayer().kick(100, dirGoalOther);					//|		|	|	|	|	if he is, kick the ball as hard as he can towards the other goal to try and score
+						} else {														//|		|	|	|	|	|	if he isn't, is he less than 2 from a player on the other team?
+							if (distanceOtherPlayer < 2) {								//|		|	|	|	|	|	|	if the agent is less than 2 from an opponent																						
+								this.getPlayer().kick(50, directionOwnPlayer);			//|		|	|	|	|	|	|	|	attempt to pass in the direction of his own team
+							} else {													//|		|	|	|	|	|	|	if he isn't
+								this.getPlayer().kick(20, dirGoalOther);				//|		|	|	|	|	|	|	|	dribble towards the other goal so he doesn't give away possession
 							}
-						}
-						// turn towards the ball and face the other goal regardless if what happens
-						getPlayer().turn(dirBall);
-						getPlayer().turnNeck(dirGoalOther);
-					} else {
-						// if he can't see his own goal, or the other goal,  turn towards the ball and face the other goal regardless if what happens
-						this.getPlayer().kick(20, dirGoalOther);
-						getPlayer().turn(dirBall);
-						getPlayer().turnNeck(dirGoalOther);
+						}						
+						getPlayer().turn(dirBall);										//|		|	|	|	|	|	|	turn towards the ball 
+						getPlayer().turnNeck(dirGoalOther);								//|		|	|	|	|	|	|	and face the other goal regardless of what happens
+					} else {															//|		|	|	|	|	|	if he can't see his own goal, or the other goal						
+						this.getPlayer().kick(20, dirGoalOther);						//|		|	|	|	|	|	|	dribble towards the other goal
+						getPlayer().turn(dirBall);										//|		|	|	|	|	|	|	turn towards the ball
+						getPlayer().turnNeck(dirGoalOther);								//|		|	|	|	|	|	|	and face the other goal regardless of what happens
 					}
 				}
 			}
