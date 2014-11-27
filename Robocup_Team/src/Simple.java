@@ -52,6 +52,8 @@ public class Simple implements ControllerPlayer {
 	private ActionsPlayer player;
 	private boolean canSeeGoal;
 	private boolean canSeeGoalOther;
+	private boolean canSeeFlagLeft;
+	private boolean canSeeFlagRight;
 	// the distance from this player to the ball
 	private double distBall = 1000;
 	// the direction from this player to the ball
@@ -66,6 +68,8 @@ public class Simple implements ControllerPlayer {
 	private double distGoalOther = 1.0;
 	// the distance from this player to the sidelines
 	private double sidelineDistance;
+	private double lineDistance;
+	private boolean canSeeLine;
 
 	/**
 	 * Constructs a new simple client.
@@ -101,20 +105,39 @@ public class Simple implements ControllerPlayer {
 		canSeeGoal = false;
 		canSeeGoalOther = false;
 		canSeeBall = false;
+		canSeeFlagRight = false;
+		canSeeFlagLeft = false;
+		canSeeLine = false;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void postInfo() {
-		if (canSeeNothing) {
+		/*if (canSeeNothing) {
 		} else if (canSeeOwnGoal) {
 			if ((distanceOwnGoal < 20) && (distanceOwnGoal > 10)) {
 				canSeeOwnGoalAction();
 			} else if (canSeeBall) {
-				if (distanceOtherPlayer < 10) {
-					canSeeBallAction(directionOwnPlayer);
+				if (distanceOwnPlayer < 10) {
+					if (distanceBallOwnPlayer < distanceBall) {
+						if (canSeeFlagLeft) {
+							getPlayer().turn(-45);
+						} else if (canSeeFlagRight) {
+							getPlayer().turn(45);
+						}
+					} else {
+						if (distanceOtherPlayer < 10) {
+							canSeeBallAction(directionOwnPlayer);
+						} else {
+							canSeeBallAction(directionOtherGoal);
+						}
+					}
 				} else {
-					canSeeBallAction(directionOtherGoal);
+					if (distanceOtherPlayer < 10) {
+						canSeeBallAction(directionOwnPlayer);
+					} else {
+						canSeeBallAction(directionOtherGoal);
+					}
 				}
 			} else {
 				canSeeAnythingAction();
@@ -129,18 +152,29 @@ public class Simple implements ControllerPlayer {
 		} else {
 			canSeeAnythingAction();
 		}
+		if (lineDistance < 10) {
+			if (canSeeFlagLeft) {
+				getPlayer().turn(-45);
+			} else if (canSeeFlagRight) {
+				getPlayer().turn(45);
+			} else {
+				getPlayer().turn(180);
+			}
+		}*/
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagRight(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
+		canSeeFlagRight = true;
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagLeft(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
+		canSeeFlagLeft = true;
 	}
 
 	/** {@inheritDoc} */
@@ -209,6 +243,8 @@ public class Simple implements ControllerPlayer {
 	@Override
 	public void infoSeeLine(Line line, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
 		canSeeNothing = false;
+		lineDistance = distance;
+		canSeeLine = true;
 	}
 
 	/** {@inheritDoc} */
