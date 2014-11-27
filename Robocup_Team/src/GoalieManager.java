@@ -136,6 +136,7 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeBall(double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save the distance and direction of the ball
 		distBall = distance;
 		dirBall = direction;
 	}
@@ -202,6 +203,7 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save data about if we see the end of the field
 		canSeeFieldEnd = true;
 	}
 
@@ -228,6 +230,7 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagPenaltyOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save data if we can see our own penalty box
 		canSeePenalty = true;
 	}
 
@@ -239,6 +242,7 @@ public class GoalieManager implements ControllerPlayer {
 	/** {@inheritDoc} */
 	@Override
 	public void infoSeeFlagGoalOwn(Flag flag, double distance, double direction, double distChange, double dirChange, double bodyFacingDirection, double headFacingDirection) {
+		//here we save data if we see our own goal depending on which flag is in view
 		if (!alreadySeeingGoal)
 			dirMultiplier *= -1.0;
 
