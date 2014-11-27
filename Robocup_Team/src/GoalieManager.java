@@ -64,58 +64,53 @@ public class GoalieManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void postInfo() {
-		if (distBall < 15) {
-			if (distBall < 0.7) {
-				if (canSeeGoal || canSeePenalty)
-					this.getPlayer().catchBall(dirBall);
-
-				if (canSeeGoal)
-					this.getPlayer().kick(60, 135);
-				else
-					this.getPlayer().kick(60, 0);
-			} else if (canSeeGoal || canSeePenalty) {
-				if (distBall < 2) {
-					needsToRetreat = true;
-
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueFast());
-				} else {
-					needsToRetreat = true;
-
-					getPlayer().turn(dirBall);
-					getPlayer().dash(randomDashValueVeryFast());
-				}
-			}
-		} else {
-			if (!canSeeGoal && !needsToRetreat) {
-				if (!canSeePenalty) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueFast());
-				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {
-					getPlayer().turn(-1.0 * goalTurn);
-					getPlayer().dash(randomDashValueSlow());
-				} else
-					getPlayer().turn(25 * dirMultiplier);
-			} else {
-				if (!canSeeGoal) {
-					getPlayer().turn(90);
-					getPlayer().dash(randomDashValueSlow());
-				} else if (distGoal > 3.5) {
-					if (!alreadySeeingGoal) {
-						getPlayer().turn(dirOwnGoal);
-						alreadySeeingGoal = true;
-					}
-
-					getPlayer().dash(randomDashValueVeryFast());
-				} else {
-					needsToRetreat = false;
-
-					if (alreadySeeingGoal) {
-						getPlayer().turn(goalTurn);
-						alreadySeeingGoal = false;
-					} else
-						alreadySeeingGoal = true;
+	public void postInfo() {                                                          //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if (distBall < 15) {                                                          //If the ball is within a range of 15 from the agnet (close)
+			if (distBall < 0.7) {                                                     //|   if the ball is within a range of 0.7 from the agent (extremely close)
+				if (canSeeGoal || canSeePenalty)                                      //|   |   if the agent can see his own team's goal or his own team's penalty box
+					this.getPlayer().catchBall(dirBall);                              //|   |   |   the agent catches the ball
+				if (canSeeGoal)                                                       //|   |   if the agent can just see his own team's goal
+					this.getPlayer().kick(60, 135);                                   //|   |   |   the agent kicks the ball with a force of 60 135 degrees clockwise from the agent is currently facing
+				else                                                                  //|   |   if the agen't can't see his own team's goal or his own team's penalty box
+					this.getPlayer().kick(60, 0);                                     //|   |   |   kick the ball in the direction the agent is currently facing
+			} else if (canSeeGoal || canSeePenalty) {                                 //|   if the agent can see his own team's goal or his own team's penalty box
+				if (distBall < 2) {                                                   //|   |   if the ball is within distance 2 from the agent (pretty close)
+					needsToRetreat = true;                                            //|   |   |   the agent needs to retreat (remember that)
+					getPlayer().turn(dirBall);                                        //|   |   |   turn the agent in the direction of the ball
+					getPlayer().dash(randomDashValueFast());                          //|   |   |   the agent dashes fast
+				} else {                                                              //|   |   if the ball is not within distance 2 of the agent (not that close)
+					needsToRetreat = true;                                            //|   |   |   the agent needs to retreat (remember that)
+					getPlayer().turn(dirBall);                                        //|   |   |   turn the agent in the direction of the ball
+					getPlayer().dash(randomDashValueVeryFast());                      //|   |   |   the agent dashes very fast
+				}                                                                     //|
+			}                                                                         //|
+		} else {                                                                      //If the ball is not within a range of 15 from the agent (not close)
+			if (!canSeeGoal && !needsToRetreat) {                                     //|   if the agent can't see his own team's goal and he doesn't need to retreat
+				if (!canSeePenalty) {                                                 //|   |   if the agent can't see his own team's penalty box
+					getPlayer().turn(90);                                             //|   |   |   turn the agent 90 degrees clockwise from where he is currently facing
+					getPlayer().dash(randomDashValueFast());                          //|   |   |   the agent dashes fast
+				} else if ((canSeeGoalLeft || canSeeGoalRight) && !canSeeFieldEnd) {  //|   |   if the agent can see either the right or left side of his own team's goal and he can't see the field end
+					getPlayer().turn(-1.0 * goalTurn);                                //|   |   |   turn the agent towards the goal
+					getPlayer().dash(randomDashValueSlow());                          //|   |   |   the player dashes slow
+				} else                                                                //|   |   if none of the conditions above are met (agent can see penalty box and field end)
+					getPlayer().turn(25 * dirMultiplier);                             //|   |   |   turn the agent 25 degrees in a specific direction
+			} else {                                                                  //|   if the agent see his own team's goal or needs to retreat
+				if (!canSeeGoal) {                                                    //|   |   if the agent can't see his own team's goal
+					getPlayer().turn(90);                                             //|   |   |   turn the agent 90 degrees from where he is facing
+					getPlayer().dash(randomDashValueSlow());                          //|   |   |   the agent dashes slow
+				} else if (distGoal > 3.5) {                                          //|   |   if the agent can see his own team's goal and he more than 3.5 distance away from it
+					if (!alreadySeeingGoal) {                                         //|   |   |   if the agent is already seeing the goal
+						getPlayer().turn(dirOwnGoal);                                 //|   |   |   |   turn the agent in the direction oh his own team's goal
+						alreadySeeingGoal = true;                                     //|   |   |   |   the agent is already seeing his own team's goal (remember that)
+					}                                                                 //|   |   |   |
+					getPlayer().dash(randomDashValueVeryFast());                      //|   |   |   the agent dashes very fast
+				} else {                                                              //|   |   if the agent is within 3.5 distance from his own team's goal
+					needsToRetreat = false;                                           //|   |   |   the agent doesn't have to retreat
+					if (alreadySeeingGoal) {                                          //|   |   |   if the agent is already seeing the goal
+						getPlayer().turn(goalTurn);                                   //|   |   |   |   the agent turns towards the goal
+						alreadySeeingGoal = false;                                    //|   |   |   |   the agent isn't seeing the goal anymore (remember that)
+					} else                                                            //|   |   |   if the agent is not already seeing the goal
+						alreadySeeingGoal = true;                                     //|   |   |   |   he is already seeing the goal
 				}
 			}
 		}
