@@ -36,7 +36,7 @@ public class AttackerManager implements ControllerPlayer {
 	private boolean canSeeGoal, canSeeGoalOther, canSeeSideline, dribble,
 			canSeePenalty, alreadySeeingGoal, canSeeFieldEnd, canSeeGoalRight,
 			canSeeGoalRightOther, canSeeGoalLeft, canSeeGoalLeftOther,
-			needsToRetreat, canSeeBall, goingForBall = false;
+			needsToRetreat, canSeeBall = false;
 	private ActionsPlayer player;
 	private Random random = null;
 	private static int count = 0;
@@ -71,7 +71,6 @@ public class AttackerManager implements ControllerPlayer {
 		canSeeFieldEnd = false;
 		canSeeSideline = false;
 		canSeeBall = false;
-		goingForBall = false;
 		canSeeFlagRight = false;
 		canSeeFlagLeft = false;
 		dribble = false;
@@ -80,13 +79,12 @@ public class AttackerManager implements ControllerPlayer {
 
 	/** {@inheritDoc} */
 	@Override
-	public void postInfo() {
-		if (distBall < 15) {
-			if (canSeeBall) {
-				getPlayer().turn(dirBall);
-				getPlayer().turnNeck(dirGoalOther);
-				getPlayer().dash(randomDashValueVeryFast());
-				goingForBall = true;
+	public void postInfo() {												////////////////////////////////////////////////////////////
+		if (distBall < 15) {												//if the distance to the ball is less than 15 from the agent		
+			if (canSeeBall) {												//|		if he player can see the ball (agent is facing the ball)
+				getPlayer().turn(dirBall);									//|		|		make the agent turn his body to the ball
+				getPlayer().turnNeck(dirGoalOther);							//|		|		make the agent turn his head to face the other goal
+				getPlayer().dash(randomDashValueVeryFast());				//|		|		make the agent dash very fast to the ball 
 			}
 			if (distBall < 0.7) {
 				if (canSeeGoal) {
@@ -127,24 +125,6 @@ public class AttackerManager implements ControllerPlayer {
 					}
 				}
 			}
-			/*
-			 * if (canSeeGoal || canSeePenalty) {
-			 * System.out.println("can see goal or penalty"); if (distBall < 2)
-			 * { getPlayer().turn(dirBall);
-			 * getPlayer().dash(randomDashValueFast()); } else {
-			 * getPlayer().turn(dirGoalOther);
-			 * getPlayer().dash(randomDashValueVeryFast()); } } else if
-			 * (canSeeGoalOther) { System.out.println("can see goal other"); if
-			 * (distBall < 2) { getPlayer().turn(dirBall);
-			 * getPlayer().dash(randomDashValueFast()); } else { if
-			 * (!goingForBall) getPlayer().turn(90);
-			 * getPlayer().dash(randomDashValueFast()); } } else {
-			 * System.out.println("else"); if (distBall < 2) {
-			 * getPlayer().turn(dirBall);
-			 * getPlayer().dash(randomDashValueFast()); } else { if
-			 * (!goingForBall) getPlayer().turn(90);
-			 * getPlayer().dash(randomDashValueFast()); } }
-			 */
 		} else {
 			if (canSeeBall) {
 				getPlayer().turn(dirBall);
@@ -184,10 +164,6 @@ public class AttackerManager implements ControllerPlayer {
 				}
 			}
 		}
-		/*
-		 * if (sidelineDistance < 0.5) { if (!goingForBall)
-		 * getPlayer().turn(90); getPlayer().dash(randomDashValueSlow()); }
-		 */
 	}
 
 	/** {@inheritDoc} */
